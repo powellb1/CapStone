@@ -1,0 +1,6 @@
+The UDOO Quad Microcontroller was not the cheapest microcontroller, but the other catagories the UDOO Quad excels in. The other microcontrollers were cheaper, but they laked in RAM, processing power, or Flash Storage.
+
+The B0027GEY3Y battery was the cheapest and most powerful for its price. The other batteries cost for for no increase in performance or power since they either had less power or the same power as the battery that was choose.
+
+The B0027G9F9M battery was the cheapest and most powerful for its price. The other batteries cost for for no increase in performance or power since they either had less power or the same power as the battery that was choosen.
+
