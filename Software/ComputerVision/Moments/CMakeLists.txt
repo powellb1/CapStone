@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( ContoursMoments )
+find_package( OpenCV REQUIRED )
+add_executable( ContoursMoments moments_demo_cam.cpp )
+target_link_libraries( ContoursMoments ${OpenCV_LIBS} )

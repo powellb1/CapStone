@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/moments_demo_cam.cpp
+opencv2/imgcodecs.hpp
+/home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/opencv2/imgcodecs.hpp
+opencv2/highgui/highgui.hpp
+/home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/opencv2/highgui/highgui.hpp
+opencv2/imgproc/imgproc.hpp
+/home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/opencv2/imgproc/imgproc.hpp
+iostream
+-
+stdio.h
+-
+stdlib.h
+-
+unistd.h
+-
+cstdlib
+-
+string
+-
+cstdio
+-
+termios.h
+-
+unistd.h
+-
+fcntl.h
+-
+
