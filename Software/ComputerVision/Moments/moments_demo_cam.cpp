@@ -10,16 +10,14 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <SerialStream.h>
 #include <unistd.h>
 #include <cstdlib>
 #include <string>
-#include <cstdio>
-#include <termios.h>
-#include <unistd.h>
-#include <fcntl.h>
 
 using namespace cv;
 using namespace std;
+using namespace LibSerial;
 
 Mat src; Mat src_gray;
 int thresh = 100;
@@ -30,15 +28,15 @@ int iRubiks = 0;
 int iSimon = 0;
 int iEtch = 0;
 int threshHold = 10000;
-FILE *file;
-char ardFlag;
-int USB;
-struct termios tty;
-struct termios tty_old;
+char abuffer[] = {'1'};
+char *datum = abuffer;
+
+
 
 /// Function header
-void thresh_callback(int, void*);
+void thresh_callback(int, void* );
 int whatObj(vector<Moments> mu, int* rubiks, int* etch, int* simon);
+bool WriteData(char *buffer, unsigned int nbChar);
 
 /**
  * @function main
@@ -49,32 +47,10 @@ int main( int, char** argv )
   //src = imread( argv[1], 1 );
   VideoCapture capture;
    capture.open( -1 );
+
 rubiks=&iRubiks;
 simon=&iSimon;
 etch=&iEtch;
-ardFlag = 'F';
-USB = open("/dev/ttyACM0",O_RDWR|O_NOCTTY);
-memset (&tty, 0 , sizeof tty);
-tty_old=tty;
-cfsetospeed(&tty, (speed_t)9600);
-cfsetispeed(&tty, (speed_t)9600);
-/* Setting other Port Stuff */
-tty.c_cflag     &=  ~PARENB;        // Make 8n1
-tty.c_cflag     &=  ~CSTOPB;
-tty.c_cflag     &=  ~CSIZE;
-tty.c_cflag     |=  CS8;
-
-tty.c_cflag     &=  ~CRTSCTS;       // no flow control
-tty.c_cc[VMIN]      =   1;                  // read doesn't block
-tty.c_cc[VTIME]     =   0;                  // 0.5 seconds read timeout
-tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
-
-/* Make raw */
-cfmakeraw(&tty);
-
-/* Flush Port, then applies attributes */
-tcflush( USB, TCIFLUSH );
-
   if ( ! capture.isOpened() ) { printf("--(!)Error opening video capture\n"); return -1; }
      while( capture.read(src) )
      {
@@ -128,11 +104,10 @@ void thresh_callback(int, void* )
      { mc[i] = Point2f( static_cast<float>(mu[i].m10/mu[i].m00) , static_cast<float>(mu[i].m01/mu[i].m00) ); }
 
   /// Draw contours
-threshHold = whatObj(mu,rubiks,etch,simon);
   Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
   for( size_t i = 0; i< contours.size(); i++ )
      {
-	if(mu[i].m00>threshHold)
+	if(mu[i].m00>1000)
 	{
        Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
        drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
@@ -145,7 +120,7 @@ threshHold = whatObj(mu,rubiks,etch,simon);
 
 
 
-
+threshHold = whatObj(mu,rubiks,etch,simon);
   /// Calculate the area with the moments 00 and compare with the result of the OpenCV function
   //printf("\t Info: Area and Contour Length \n");
   for( size_t i = 0; i< contours.size(); i++ )
@@ -161,85 +136,14 @@ threshHold = whatObj(mu,rubiks,etch,simon);
      }
   namedWindow( "Contours", WINDOW_AUTOSIZE );
   imshow( "Contours", drawing );
- if(*rubiks==10)
+ if((*rubiks==10) || (*simon==10) || (*etch==10))
  {
 	*simon=0;
 	*etch=0;
 	*rubiks=0;
 
 
-
-    write( USB, "2", 1 );
-
-tcflush( USB, TCIFLUSH );
-int n = 0;
-char buf = '\0';
-
-/* Whole response*/
-std::string response;
-
-do
-{
-read( USB, &buf, 1 );
-}
-while(buf!='K');
-//response.append( &buf );
-
-cout <<"Char from Arduino: "<<buf<<endl;
-tcflush(USB, TCIFLUSH);
-
- }
- if(*simon==10)
- {
-	*simon=0;
-	*etch=0;
-	*rubiks=0;
-write( USB, "3", 1 );
-
-
-int n = 0;
-char buf = '\0';
-
-/* Whole response*/
-std::string response;
-
-do
-{
-read( USB, &buf, 1 );
-}
-while(buf!='K');
-//response.append( &buf );
-
-cout <<"Char from Arduino: "<<buf<<endl;
-tcflush(USB, TCIFLUSH);
-
-
- }
-
- if(*etch==10)
- {
-	*simon=0;
-	*etch=0;
-	*rubiks=0;
-write( USB, "1", 1 );
-
-
-int n = 0;
-char buf = '\0';
-
-/* Whole response*/
-std::string response;
-
-do
-{
-read( USB, &buf, 1 );
-}
-while(buf!='K');
-//response.append( &buf );
-
-cout <<"Char from Arduino: "<<buf<<endl;
-tcflush(USB, TCIFLUSH);
-
+	getchar();
  }
 }
 
@@ -248,7 +152,7 @@ int whatObj(vector<Moments> mu, int* rubiks, int* etch, int* simon)
 int k=0;
 for( size_t i =0; i<mu.size(); i++)
 {
-if(mu[i].m00>5000)
+if(mu[i].m00>1000)
 k++;
 
 }
@@ -257,7 +161,7 @@ if(k==4)
 (*etch)++;
 printf("Etch! %d\n",*etch);
 
-return 5000;
+return 1000;
 }
 
 k=0;
@@ -280,7 +184,7 @@ k=0;
 
 for( size_t i =0; i<mu.size(); i++)
 {
-if(mu[i].m00>2000)
+if(mu[i].m00>1500)
 k++;
 
 }
@@ -289,10 +193,21 @@ if(k==10)
 {
 (*simon)++;
 printf("Simon! %d\n",*simon);
-return 2000;
+return 1500;
 }
 }
 
+bool WriteData(char *buffer, unsigned int nbChar)
+{
+DWORD bytesSend;
 
+if(!WriteFile(hSerial, (void *)buffer, nbChar, &bytesSend, 0))
+{
+return false;
+}
+else
+return true;
+
+}
 
 
