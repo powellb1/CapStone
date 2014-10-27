@@ -2,11 +2,11 @@
 #include <PID_v1.h>
 
 //Define pins for QRE1113s
-int QRE1Pin = 5;
-int QRE2Pin = 6;
-int QRE3Pin = 7;
-int QRE4Pin = 8;
-int QRE5Pin = 9;
+#define QRE1Pin  5
+#define QRE2Pin  6
+#define QRE3Pin  7
+#define QRE4Pin  8
+#define QRE5Pin  9
 
 //Pins for Motors
 int dcLeft = 3;
@@ -14,7 +14,7 @@ int dcRight = 4;
 
 //For PID
 double pidSetpoint, pidInput, pidOutput;
-PID pid = (&pidInput, &pidOutput, &pidSetpoint, 2,5,1, DIRECT);
+PID pid(&pidInput, &pidOutput, &pidSetpoint, 2,0,0, DIRECT);
 
 
 void setup() {
@@ -24,7 +24,7 @@ void setup() {
   
   //PID setup
   pidInput = 3000;
-  pidSetpoint = 100;
+  pidSetpoint = 0;
   pid.SetMode(AUTOMATIC);
   
 }
@@ -40,10 +40,11 @@ void loop() {
   
   //Average values for PID
  
-   pidInput = (QRE1val*-2 + QRE2val*-1 + QREval3*0 + QREval4*1 + QREval5*2);
+   pidInput = (QRE1val*-2 + QRE2val*-1 + QRE3val*0 + QRE4val*1 + QRE5val*2);
    pid.Compute();
    
   //Adjust motors based off of values from QREs
+  
   
   
 }
@@ -65,9 +66,18 @@ int readQRE(int QRENum){
   time = micros();
   
   //This while times how long the inputis high but will quit if nothing happens after 3 miliseconds.
-  while(digRead(QRENum) == HIGH && (micros()-time < 3000)){
+  while(digitalRead(QRENum) == HIGH && (micros()-time < 3000)){
   diff = micros() - time;
   }  
   
   return diff;
+}
+
+
+
+
+void stop(){
+ 
+ analogWrite(dcLeft, 0);
+ analogWrite(dcRight, 0);
 }
