@@ -12,6 +12,10 @@
 int dcLeft = 3;
 int dcRight = 4;
 
+//Static motor speed
+int static leftSpeed;
+int static rightSpeed;
+
 //For PID
 double pidSetpoint, pidInput, pidOutput;
 PID pid(&pidInput, &pidOutput, &pidSetpoint, 2,0,0, DIRECT);
@@ -44,7 +48,8 @@ void loop() {
    pid.Compute();
    
   //Adjust motors based off of values from QREs
-  
+  analogWrite(dcLeft, leftSpeed + pidOutput);
+  analogWrite(dcRight, rightSpeed + pidOutput);
   
   
 }
@@ -72,6 +77,7 @@ int readQRE(int QRENum){
   
   return diff;
 }
+
 
 
 
