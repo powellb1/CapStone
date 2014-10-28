@@ -38,8 +38,8 @@ struct termios tty_old;
 
 /// Function header
 void thresh_callback(int, void*);
-int whatObj(vector<vector<Point> > contours, int* rubiks, int* etch, int* simon);
-bool findLarger(Moments m1, Moments m2);
+vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* etch, int* simon);
+bool findLarger(double d1, double d2);
 
 /**
  * @function main
@@ -120,11 +120,33 @@ void thresh_callback(int, void* )
 
 	/// Get the moments
 	vector<Moments> mu(contours.size() );
+	vector<double> area(contours.size());
+	vector<double> areaSorted(contours.size());
+	vector<double> arcs(contours.size());
+	vector<double> arcSorted(contours.size());
 	for( size_t i = 0; i < contours.size(); i++ )
-	{ mu[i] = moments( contours[i], false ); }
+	{ 
+		mu[i] = moments( contours[i], false ); 
+		area[i] = contourArea(contours[i]);	
+		arcs[i] = arcLength( contours[i], true );
+	}
 
-	//sort(mu.begin(),mu.end(),findLarger);
-	//cout<<"Number of contours found: "<< mu.size()<<endl;	
+	//areaSorted=area;
+	//arcSorted = arcs;
+	//sort(arcSorted.begin(),arcSorted.end());
+	//reverse(arcSorted.begin(),arcSorted.end());
+	//sort(areaSorted.begin(),areaSorted.end());
+	//reverse(areaSorted.begin(),areaSorted.end());
+	//cout<<"Area vecotr length: "<<area.size()<<endl;
+
+	if(area.size()==0 || arcs.size()==0)
+		return;
+	//cout<<"Contour with biggest area: "<< *max_element(area.begin(),area.end())<<endl;
+
+	//for(int i = 0;i<9;i++)
+	//{
+	//	cout<<areaSorted[i]<<endl;
+	//}	
 
 	///  Get the mass centers:
 	vector<Point2f> mc( contours.size() );
@@ -132,20 +154,26 @@ void thresh_callback(int, void* )
 	{ mc[i] = Point2f( static_cast<float>(mu[i].m10/mu[i].m00) , static_cast<float>(mu[i].m01/mu[i].m00) ); }
 
 	/// Draw contours
-	threshHold = whatObj(contours,rubiks,etch,simon);
+	vector<int> needDrawing = whatObj(area, arcs,rubiks,etch,simon);
+	if(needDrawing.size()==0)
+	return;
 	//threshHold=200;
 
 	Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
 	
-	for( size_t i = 0; i< contours.size(); i++ )
+	//for( size_t i = 0; i< contours.size(); i++ )
+	for(size_t i = 0; i< needDrawing.size(); i++) 
 	{
-		if(mu[i].m00>threshHold)
-		{
-			//printf(" * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f \n", (int)i, mu[i].m00, contourArea(contours[i]), arcLength( contours[i], true ) );
+			//if(area[i]>100 && area[i] <150)
+			//{
 			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-			drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
-			circle( drawing, mc[i], 4, color, -1, 8, 0 );
-		}
+			drawContours( drawing, contours, (int)needDrawing[i], color, 2, 8, hierarchy, 0, Point() );
+			circle( drawing, mc[needDrawing[i]], 4, color, -1, 8, 0 );
+			//Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+			//drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
+			//circle( drawing, mc[i], 4, color, -1, 8, 0 );
+			//}
+
 	}
 
 	namedWindow( "Contours", WINDOW_AUTOSIZE );
@@ -228,63 +256,77 @@ void thresh_callback(int, void* )
 	
 }
 
-int whatObj(vector<vector<Point> > contours, int* rubiks, int* etch, int* simon)
+vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* etch, int* simon)
 {
-	int s=0;
+	int s = 0;
 	int e = 0;
 	int r = 0;
-	int k = 0;
+	vector<int> eIdx;
+	vector<int> sIdx;
+	vector<int> rIdx;
 
 
-	for( size_t i =0; i<contours.size(); i++)
+	for( size_t i =0; i<area.size(); i++)
 	{
-/*
-		if(contourArea(contours[i])>5000)
-			e++;
-		if(contourArea(contours[i])>1000)
-			r++;
-		if(contourArea(contours[i])>1000)
-			s++;
-*/
 
-		if(contourArea(contours[i])>1000)
-			k++;
+		if(area[i]>102000&&area[i]<103000)
+		{
+			e++;
+			eIdx.push_back(i);
+		}	
+		if(area[i]>12000&&area[i]<13000)
+		{
+			r++;
+			rIdx.push_back(i);
+		}
+		if((arcs[i]>800) || ((area[i]>14000)&&(area[i]<15500)))
+		{
+			s++;
+			sIdx.push_back(i);
+		}
+
+		//if(area[i]>1000)
+		//	k++;
 		
 	}
 	//cout<<"e: "<<e<<"\tr: "<<r<<"\ts: "<<s<<endl;
-	cout<<"k: "<<k<<endl;
 
-	if(k==9)
+	if(r==9)
 	{
 		(*rubiks)++;
+		*etch=0;
+		*simon=0;
 		printf("Rubik's cube! %d\n",*rubiks);
+		return rIdx;
 
-		return 1000;
 	}
 
-	else if(k==5)
+	else if(s==7)
 	{
 		(*simon)++;
+		*etch=0;
+		*rubiks=0;
 		printf("Simon! %d\n",*simon);
-		return 200;
+		return sIdx;
+		
 	}
-	else if(k==1)
+	else if(e==1)
 	{
 		(*etch)++;
+		*simon=0;
+		*rubiks=0;
 		printf("Etch! %d\n",*etch);
-
-		return 5000;
+		return eIdx;
 	}
-
-
-	return 10000;
+	vector<int> emptyVector;
+	return emptyVector;
 
 
 }
 
-bool findLarger(Moments m1,Moments m2)
+bool findLarger(double d1, double d2)
 {
-return m1.m00>m2.m00;
+return d1<d2;
 }
 
 
