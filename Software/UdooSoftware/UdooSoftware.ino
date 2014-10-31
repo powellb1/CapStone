@@ -2,15 +2,16 @@
 #include <PID_v1.h>
 
 //Define pins for QRE1113s
-#define QRE1Pin  5
-#define QRE2Pin  6
-#define QRE3Pin  7
-#define QRE4Pin  8
-#define QRE5Pin  9
+int QRE1Pin = 6;
+int QRE2Pin = 5;
+int QRE3Pin = 4;
+int QRE4Pin = 3;
+int QRE5Pin = 2;
+
 
 //Pins for Motors
-int dcLeft = 3;
-int dcRight = 4;
+int dcLeft = 10;
+int dcRight = 9;
 
 //Static motor speed
 int static leftSpeed;
@@ -18,13 +19,14 @@ int static rightSpeed;
 
 //For PID
 double pidSetpoint, pidInput, pidOutput;
-PID pid(&pidInput, &pidOutput, &pidSetpoint, 2,0,0, DIRECT);
+PID pid(&pidInput, &pidOutput, &pidSetpoint, 1,0,0, DIRECT);
 
 
 void setup() {
   Serial.begin(9600);
   pinMode(dcLeft, OUTPUT);
   pinMode(dcRight, OUTPUT);
+
   
   //PID setup
   pidInput = 3000;
@@ -47,9 +49,32 @@ void loop() {
    pidInput = (QRE1val*-2 + QRE2val*-1 + QRE3val*0 + QRE4val*1 + QRE5val*2);
    pid.Compute();
    
+     
   //Adjust motors based off of values from QREs
-  analogWrite(dcLeft, leftSpeed + pidOutput);
-  analogWrite(dcRight, rightSpeed + pidOutput);
+ // if((leftSpeed + pidOutput) >= 0 && (rightSpeed + pidOutput) >= 0){
+   //  analogWrite(dcLeft, leftSpeed + pidOutput);
+     ///analogWrite(dcRight, rightSpeed + pidOutput);
+//  }
+ 
+ //Print QRE values
+ Serial.print(QRE1val);
+ Serial.print("\t");
+ Serial.print(QRE2val);
+ Serial.print("\t");
+ Serial.print(QRE3val);
+ Serial.print("\t");
+ Serial.print(QRE4val);
+ Serial.print("\t");
+ Serial.print(QRE5val);
+ Serial.print("\n");
+ 
+ //Print pid vals
+ Serial.print("Sensor array value: ");
+ Serial.print(pidInput);
+ Serial.print("\t");
+ Serial.print("PID output value: ");
+ Serial.print(pidOutput);
+ Serial.print("\n\n");
   
   
 }
