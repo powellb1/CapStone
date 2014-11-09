@@ -26,6 +26,7 @@ void loop()
   if(Serial.available()>0)
   {
     incomingByte = Serial.read()-48;
+        Serial.println(incomingByte);
     Serial.flush();
     switch(incomingByte)
     {
@@ -65,7 +66,7 @@ void loop()
         delay(5000);
         digitalWrite(etch,LOW);
         digitalWrite(rubiks,LOW);
-        Serial.write('D');
+        Serial.write('K');
         delay(1000);
       }
     }

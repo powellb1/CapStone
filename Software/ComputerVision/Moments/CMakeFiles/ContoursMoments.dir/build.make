@@ -38,10 +38,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments
+CMAKE_SOURCE_DIR = /home/pi/Capstone/Software/ComputerVision/Moments
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments
+CMAKE_BINARY_DIR = /home/pi/Capstone/Software/ComputerVision/Moments
 
 # Include any dependencies generated for this target.
 include CMakeFiles/ContoursMoments.dir/depend.make
@@ -54,17 +54,17 @@ include CMakeFiles/ContoursMoments.dir/flags.make
 
 CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.o: CMakeFiles/ContoursMoments.dir/flags.make
 CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.o: moments_demo_cam.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/pi/Capstone/Software/ComputerVision/Moments/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.o -c /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/moments_demo_cam.cpp
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.o -c /home/pi/Capstone/Software/ComputerVision/Moments/moments_demo_cam.cpp
 
 CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/moments_demo_cam.cpp > CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/pi/Capstone/Software/ComputerVision/Moments/moments_demo_cam.cpp > CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.i
 
 CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/moments_demo_cam.cpp -o CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/pi/Capstone/Software/ComputerVision/Moments/moments_demo_cam.cpp -o CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.s
 
 CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.o.requires:
 .PHONY : CMakeFiles/ContoursMoments.dir/moments_demo_cam.cpp.o.requires
@@ -126,6 +126,6 @@ CMakeFiles/ContoursMoments.dir/clean:
 .PHONY : CMakeFiles/ContoursMoments.dir/clean
 
 CMakeFiles/ContoursMoments.dir/depend:
-	cd /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments /home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/CMakeFiles/ContoursMoments.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/pi/Capstone/Software/ComputerVision/Moments && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/pi/Capstone/Software/ComputerVision/Moments /home/pi/Capstone/Software/ComputerVision/Moments /home/pi/Capstone/Software/ComputerVision/Moments /home/pi/Capstone/Software/ComputerVision/Moments /home/pi/Capstone/Software/ComputerVision/Moments/CMakeFiles/ContoursMoments.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ContoursMoments.dir/depend
 

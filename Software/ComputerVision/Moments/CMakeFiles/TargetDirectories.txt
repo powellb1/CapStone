@@ -1,1 +1,1 @@
-/home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/CMakeFiles/ContoursMoments.dir
+/home/pi/Capstone/Software/ComputerVision/Moments/CMakeFiles/ContoursMoments.dir

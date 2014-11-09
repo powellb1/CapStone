@@ -158,18 +158,18 @@ void thresh_callback(int, void* )
 	if(needDrawing.size()==0)
 	return;
 	//threshHold=200;
-
 	Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
 	
 	//for( size_t i = 0; i< contours.size(); i++ )
 	for(size_t i = 0; i< needDrawing.size(); i++) 
 	{
-			//if(area[i]>100 && area[i] <150)
+			//cout<<area[i]<<endl;
+			//if((area[i]>200 &&area[i]<300)|| (area[i]>7000 && area[i] <8000)||(area[i]>11000))
 			//{
+			//cout<<area[i]<<endl;
 			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
 			drawContours( drawing, contours, (int)needDrawing[i], color, 2, 8, hierarchy, 0, Point() );
-			circle( drawing, mc[needDrawing[i]], 4, color, -1, 8, 0 );
-			//Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+			circle( drawing, mc[needDrawing[i]], 4, color, -1, 8, 0);
 			//drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
 			//circle( drawing, mc[i], 4, color, -1, 8, 0 );
 			//}
@@ -187,10 +187,8 @@ void thresh_callback(int, void* )
 		write( USB, "2", 1 );
 		int n = 0;
 		char buf = '\0';
-
+		cout<<"sending out 2"<<endl;
 		/* Whole response*/
-		std::string response;
-
 		do
 		{
 			read( USB, &buf, 1 );
@@ -211,7 +209,6 @@ void thresh_callback(int, void* )
 
 		int n = 0;
 		char buf = '\0';
-
 		/* Whole response*/
 		std::string response;
 
@@ -269,17 +266,17 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 	for( size_t i =0; i<area.size(); i++)
 	{
 
-		if(area[i]>102000&&area[i]<103000)
+		if(area[i]>70&&area[i]<200)
 		{
 			e++;
 			eIdx.push_back(i);
 		}	
-		if(area[i]>12000&&area[i]<13000)
+		if(area[i]>8000 && area[i]<11500)
 		{
 			r++;
 			rIdx.push_back(i);
 		}
-		if((arcs[i]>800) || ((area[i]>14000)&&(area[i]<15500)))
+		if((area[i]>200 &&area[i]<300)|| (area[i]>7000 && area[i] <8000)||(area[i]>11000))
 		{
 			s++;
 			sIdx.push_back(i);
@@ -289,7 +286,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 		//	k++;
 		
 	}
-	//cout<<"e: "<<e<<"\tr: "<<r<<"\ts: "<<s<<endl;
+	cout<<"e: "<<e<<"\tr: "<<r<<"\ts: "<<s<<endl;
 
 	if(r==9)
 	{
@@ -301,7 +298,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 
 	}
 
-	else if(s==7)
+	else if(s==3)
 	{
 		(*simon)++;
 		*etch=0;

@@ -6,13 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/moments_demo_cam.cpp
+/home/pi/Capstone/Software/ComputerVision/Moments/moments_demo_cam.cpp
 opencv2/imgcodecs.hpp
-/home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/opencv2/imgcodecs.hpp
+/home/pi/Capstone/Software/ComputerVision/Moments/opencv2/imgcodecs.hpp
 opencv2/highgui/highgui.hpp
-/home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/opencv2/highgui/highgui.hpp
+/home/pi/Capstone/Software/ComputerVision/Moments/opencv2/highgui/highgui.hpp
 opencv2/imgproc/imgproc.hpp
-/home/pi/Desktop/opencv/samples/cpp/tutorial_code/ShapeDescriptors/Moments/opencv2/imgproc/imgproc.hpp
+/home/pi/Capstone/Software/ComputerVision/Moments/opencv2/imgproc/imgproc.hpp
 iostream
 -
 stdio.h
