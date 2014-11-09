@@ -14,9 +14,9 @@ delay (50);
 for (int i = 0; i <steps; i ++) 
 {     
 digitalWrite (stepperPin, HIGH);     
-delayMicroseconds (100 );     
+delayMicroseconds (75 );     
 digitalWrite (stepperPin, LOW);     
-delayMicroseconds (100);   
+delayMicroseconds (75);   
 } 
 }
 void loop () 
@@ -26,8 +26,6 @@ delay (500);
 step (false, 10000);   
 delay (500); 
 }
-
-
 
 
 
