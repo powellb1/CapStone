@@ -1,6 +1,6 @@
 
-int dirPin  = 2; 
-int stepperPin = 3; 
+int dirPin  = 3; 
+int stepperPin = 2; 
 void setup () 
 {   
 pinMode (dirPin, OUTPUT);   
