@@ -21,6 +21,7 @@
 using namespace cv;
 using namespace std;
 
+Point2f midPoint;
 Mat src; Mat src_gray;
 int thresh = 20;
 int max_thresh = 255;
@@ -30,13 +31,16 @@ int iRubiks = 0;
 int iSimon = 0;
 int iEtch = 0;
 int threshHold = 10000;
+VideoCapture capture;
 FILE *file;
 char ardFlag;
 int USB;
 struct termios tty;
 struct termios tty_old;
+struct termios cam_tty;
 
 /// Function header
+void capImage();
 void thresh_callback(int, void*);
 vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* etch, int* simon);
 bool findLarger(double d1, double d2);
@@ -48,8 +52,7 @@ int main( int, char** argv )
 {
 	/// Load source image and convert it to gray
 	//src = imread( argv[1], 1 );
-	VideoCapture capture;
-	capture.open( -1 );
+
 	rubiks=&iRubiks;
 	simon=&iSimon;
 	etch=&iEtch;
@@ -70,14 +73,47 @@ int main( int, char** argv )
 	tty.c_cc[VTIME]     =   0;                  // 0.5 seconds read timeout
 	tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
 
+	
+
 	/* Make raw */
 	cfmakeraw(&tty);
 
 	/* Flush Port, then applies attributes */
 	tcflush( USB, TCIFLUSH );
+while(true)
+{
+	char buf = '\0';
+	/* Whole response*/
+	do
+	{
+		read( USB, &buf, 1 );
+	}
+	while(buf!='C');
+	//response.append( &buf );
+	cout <<"Camera on!: "<<buf<<endl;
+	tcflush(USB, TCIFLUSH);
+	capImage();
+}
+/*
+	buf='\0';
+	do
+	{
+		capImage();
+		read( USB, &buf, 1 );
+	}
+	while(buf!='C');
+*/
 
-	if ( ! capture.isOpened() ) { printf("--(!)Error opening video capture\n"); return -1; }
-	while( capture.read(src) )
+}
+
+
+void capImage()
+{
+	capture.open( -1 );
+	char cam_buf ='\0';
+	cout<<"Capturing image"<<endl;
+	if ( ! capture.isOpened() ) { printf("--(!)Error opening video capture\n"); return; }
+	while(capture.read(src))
 	{
 
 
@@ -85,31 +121,30 @@ int main( int, char** argv )
 		if( src.empty() )
 		{ 
 			printf(" --(!) No captured frame -- Break!");
-			break;
+			return;
 		}
 		/// Convert image to gray and blur it
+		Size s = src.size();
+		//cout<<s<<endl;
+		midPoint = Point2f(static_cast<float>(s.height/2.0),static_cast<float>(s.width/2.0));
 		cvtColor( src, src_gray, COLOR_BGR2GRAY );
 		blur( src_gray, src_gray, Size(3,3) );
 
-		/// Create Window
-		const char* source_window = "Source";
-		namedWindow( source_window, WINDOW_AUTOSIZE );
-		imshow( source_window, src );
-
-		//createTrackbar( " Canny thresh:", "Source", &thresh, max_thresh, thresh_callback );
 		thresh_callback( 0, 0 );
-
-		int c = waitKey(10);
-		if( (char)c == 'c' ) { break; }
+		read( USB, &cam_buf, 1 );
+		if(cam_buf=='C')
+		{
+		cout<<"Camera off!: "<<cam_buf<<endl;
+		return;
+		}
 	}
-	return(0);
+
 }
 
-/**
- * @function thresh_callback
- */
 void thresh_callback(int, void* )
 {
+
+	//cout<<"Calling thresh"<<endl;
 	Mat canny_output;
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;  
@@ -138,7 +173,7 @@ void thresh_callback(int, void* )
 	//sort(areaSorted.begin(),areaSorted.end());
 	//reverse(areaSorted.begin(),areaSorted.end());
 	//cout<<"Area vecotr length: "<<area.size()<<endl;
-
+	
 	if(area.size()==0 || arcs.size()==0)
 		return;
 	//cout<<"Contour with biggest area: "<< *max_element(area.begin(),area.end())<<endl;
@@ -155,31 +190,136 @@ void thresh_callback(int, void* )
 
 	/// Draw contours
 	vector<int> needDrawing = whatObj(area, arcs,rubiks,etch,simon);
-	if(needDrawing.size()==0)
-	return;
+	//if(needDrawing.size()==0)
+	//return;
 	//threshHold=200;
-	Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
-	
+	//Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
+
 	//for( size_t i = 0; i< contours.size(); i++ )
 	for(size_t i = 0; i< needDrawing.size(); i++) 
 	{
+		//cout<<area[i]<<endl;
+		//if(arcs[i]>800 || ((area[i]>14000 && area[i]<1500)))
+		//if(area[i]>5 && area[i]<1000)
+		//{
 			//cout<<area[i]<<endl;
-			//if((area[i]>200 &&area[i]<300)|| (area[i]>7000 && area[i] <8000)||(area[i]>11000))
-			//{
-			//cout<<area[i]<<endl;
-			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-			drawContours( drawing, contours, (int)needDrawing[i], color, 2, 8, hierarchy, 0, Point() );
-			circle( drawing, mc[needDrawing[i]], 4, color, -1, 8, 0);
+			//Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+			//drawContours( drawing, contours, (int)needDrawing[i], color, 2, 8, hierarchy, 0, Point() );
+			//circle( drawing, mc[needDrawing[i]], 4, color, -1, 8, 0);
+			Point2f test = midPoint-mc[needDrawing[i]];
+			cout<<"x "<<test.x<<endl;
 			//drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
 			//circle( drawing, mc[i], 4, color, -1, 8, 0 );
-			//}
+		//}
 
 	}
 
-	namedWindow( "Contours", WINDOW_AUTOSIZE );
-	imshow( "Contours", drawing );
 
-	if(*rubiks==10)
+	
+
+
+
+}
+
+vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* etch, int* simon)
+{
+	int s = 0;
+	int e = 0;
+	int r = 0;
+	vector<int> eIdx;
+	vector<int> sIdx;
+	vector<int> rIdx;
+
+
+	for( size_t i =0; i<area.size(); i++)
+	{
+		/*
+		if(area[i]>70&&area[i]<150)
+		{
+			e++;
+			eIdx.push_back(i);
+		}
+		*/	
+		if(area[i]>4000 && area[i]<5000)
+		{
+			r++;
+			rIdx.push_back(i);
+		}
+		/*
+		if((area[i]>200 &&area[i]<300)|| (area[i]>7000 && area[i] <8000)||(area[i]>11000 && area[i]<12000))
+		{
+			cout<<area[i]<<endl;
+			s++;
+			sIdx.push_back(i);
+		}
+		*/
+		//if(area[i]>1000)
+		//	k++;
+
+	}
+	cout<<"e: "<<e<<"\tr: "<<r<<"\ts: "<<s<<endl;
+
+	if(r==9)
+	{
+		(*rubiks)++;
+		*etch=0;
+		*simon=0;
+		printf("Rubik's cube! %d\n",*rubiks);
+		return rIdx;
+
+	}
+
+	else if(s==3)
+	{
+		(*simon)++;
+		*etch=0;
+		*rubiks=0;
+		printf("Simon! %d\n",*simon);
+		return sIdx;
+
+	}
+	else if(e==1)
+	{
+		(*etch)++;
+		*simon=0;
+		*rubiks=0;
+		printf("Etch! %d\n",*etch);
+		return eIdx;
+	}
+	vector<int> emptyVector;
+	return emptyVector;
+
+
+}
+
+void printShuffle(float Diff)
+{
+
+	//need to write how many inches to shuffle (or cm)
+	write( USB, "1", 1 );
+
+
+		int n = 0;
+		char buf = '\0';
+
+		/* Whole response*/
+		std::string response;
+
+		do
+		{
+			read( USB, &buf, 1 );
+		}
+		while(buf!='M');
+		//response.append( &buf );
+		tcflush(USB, TCIFLUSH);
+		cout <<"Char from Arduino: "<<buf<<endl;
+		
+}
+
+void printObject()
+{
+
+if(*rubiks==10)
 	{
 		*simon=0;
 		*etch=0;
@@ -187,13 +327,12 @@ void thresh_callback(int, void* )
 		write( USB, "2", 1 );
 		int n = 0;
 		char buf = '\0';
-		cout<<"sending out 2"<<endl;
 		/* Whole response*/
 		do
 		{
 			read( USB, &buf, 1 );
 		}
-		while(buf!='K');
+		while(buf!='R');
 		//response.append( &buf );
 		cout <<"Char from Arduino: "<<buf<<endl;
 		tcflush(USB, TCIFLUSH);
@@ -216,11 +355,11 @@ void thresh_callback(int, void* )
 		{
 			read( USB, &buf, 1 );
 		}
-		while(buf!='K');
+		while(buf!='S');
 		//response.append( &buf );
 
 		cout <<"Char from Arduino: "<<buf<<endl;
-
+		tcflush(USB, TCIFLUSH);
 
 	}
 
@@ -242,88 +381,11 @@ void thresh_callback(int, void* )
 		{
 			read( USB, &buf, 1 );
 		}
-		while(buf!='K');
+		while(buf!='E');
 		//response.append( &buf );
-
+		tcflush(USB, TCIFLUSH);
 		cout <<"Char from Arduino: "<<buf<<endl;
 
 	}
 
-
-	
 }
-
-vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* etch, int* simon)
-{
-	int s = 0;
-	int e = 0;
-	int r = 0;
-	vector<int> eIdx;
-	vector<int> sIdx;
-	vector<int> rIdx;
-
-
-	for( size_t i =0; i<area.size(); i++)
-	{
-
-		if(area[i]>70&&area[i]<200)
-		{
-			e++;
-			eIdx.push_back(i);
-		}	
-		if(area[i]>8000 && area[i]<11500)
-		{
-			r++;
-			rIdx.push_back(i);
-		}
-		if((area[i]>200 &&area[i]<300)|| (area[i]>7000 && area[i] <8000)||(area[i]>11000))
-		{
-			s++;
-			sIdx.push_back(i);
-		}
-
-		//if(area[i]>1000)
-		//	k++;
-		
-	}
-	cout<<"e: "<<e<<"\tr: "<<r<<"\ts: "<<s<<endl;
-
-	if(r==9)
-	{
-		(*rubiks)++;
-		*etch=0;
-		*simon=0;
-		printf("Rubik's cube! %d\n",*rubiks);
-		return rIdx;
-
-	}
-
-	else if(s==3)
-	{
-		(*simon)++;
-		*etch=0;
-		*rubiks=0;
-		printf("Simon! %d\n",*simon);
-		return sIdx;
-		
-	}
-	else if(e==1)
-	{
-		(*etch)++;
-		*simon=0;
-		*rubiks=0;
-		printf("Etch! %d\n",*etch);
-		return eIdx;
-	}
-	vector<int> emptyVector;
-	return emptyVector;
-
-
-}
-
-bool findLarger(double d1, double d2)
-{
-return d1<d2;
-}
-
-

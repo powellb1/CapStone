@@ -1,1 +1,2 @@
 /home/pi/Capstone/Software/ComputerVision/Moments/CMakeFiles/ContoursMoments.dir
+/home/pi/Capstone/Software/ComputerVision/Moments/CMakeFiles/WorkingCam.dir

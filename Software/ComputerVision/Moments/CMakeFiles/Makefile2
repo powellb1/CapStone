@@ -91,6 +91,41 @@ clean: CMakeFiles/ContoursMoments.dir/clean
 .PHONY : clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/WorkingCam.dir
+
+# All Build rule for target.
+CMakeFiles/WorkingCam.dir/all:
+	$(MAKE) -f CMakeFiles/WorkingCam.dir/build.make CMakeFiles/WorkingCam.dir/depend
+	$(MAKE) -f CMakeFiles/WorkingCam.dir/build.make CMakeFiles/WorkingCam.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/pi/Capstone/Software/ComputerVision/Moments/CMakeFiles  2
+	@echo "Built target WorkingCam"
+.PHONY : CMakeFiles/WorkingCam.dir/all
+
+# Include target in all.
+all: CMakeFiles/WorkingCam.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/WorkingCam.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Capstone/Software/ComputerVision/Moments/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/WorkingCam.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Capstone/Software/ComputerVision/Moments/CMakeFiles 0
+.PHONY : CMakeFiles/WorkingCam.dir/rule
+
+# Convenience name for target.
+WorkingCam: CMakeFiles/WorkingCam.dir/rule
+.PHONY : WorkingCam
+
+# clean rule for target.
+CMakeFiles/WorkingCam.dir/clean:
+	$(MAKE) -f CMakeFiles/WorkingCam.dir/build.make CMakeFiles/WorkingCam.dir/clean
+.PHONY : CMakeFiles/WorkingCam.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/WorkingCam.dir/clean
+.PHONY : clean
+
+#=============================================================================
 # Special targets to cleanup operation of make.
 
 # Special rule to run CMake to check the build system integrity.

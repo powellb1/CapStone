@@ -114,6 +114,43 @@ ContoursMoments/fast:
 	$(MAKE) -f CMakeFiles/ContoursMoments.dir/build.make CMakeFiles/ContoursMoments.dir/build
 .PHONY : ContoursMoments/fast
 
+#=============================================================================
+# Target rules for targets named WorkingCam
+
+# Build rule for target.
+WorkingCam: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 WorkingCam
+.PHONY : WorkingCam
+
+# fast build rule for target.
+WorkingCam/fast:
+	$(MAKE) -f CMakeFiles/WorkingCam.dir/build.make CMakeFiles/WorkingCam.dir/build
+.PHONY : WorkingCam/fast
+
+cam_working.o: cam_working.cpp.o
+.PHONY : cam_working.o
+
+# target to build an object file
+cam_working.cpp.o:
+	$(MAKE) -f CMakeFiles/WorkingCam.dir/build.make CMakeFiles/WorkingCam.dir/cam_working.cpp.o
+.PHONY : cam_working.cpp.o
+
+cam_working.i: cam_working.cpp.i
+.PHONY : cam_working.i
+
+# target to preprocess a source file
+cam_working.cpp.i:
+	$(MAKE) -f CMakeFiles/WorkingCam.dir/build.make CMakeFiles/WorkingCam.dir/cam_working.cpp.i
+.PHONY : cam_working.cpp.i
+
+cam_working.s: cam_working.cpp.s
+.PHONY : cam_working.s
+
+# target to generate assembly for a file
+cam_working.cpp.s:
+	$(MAKE) -f CMakeFiles/WorkingCam.dir/build.make CMakeFiles/WorkingCam.dir/cam_working.cpp.s
+.PHONY : cam_working.cpp.s
+
 moments_demo_cam.o: moments_demo_cam.cpp.o
 .PHONY : moments_demo_cam.o
 
@@ -145,8 +182,12 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... ContoursMoments"
+	@echo "... WorkingCam"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... cam_working.o"
+	@echo "... cam_working.i"
+	@echo "... cam_working.s"
 	@echo "... moments_demo_cam.o"
 	@echo "... moments_demo_cam.i"
 	@echo "... moments_demo_cam.s"

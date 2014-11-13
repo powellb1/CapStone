@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project( ContoursMoments )
+project( WorkingCam )
 find_package( OpenCV REQUIRED )
 add_executable( ContoursMoments moments_demo_cam.cpp )
+add_executable( WorkingCam cam_working.cpp )
 target_link_libraries( ContoursMoments ${OpenCV_LIBS} )
+target_link_libraries( WorkingCam ${OpenCV_LIBS} )

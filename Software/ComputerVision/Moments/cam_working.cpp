@@ -164,7 +164,7 @@ void thresh_callback(int, void* )
 	for(size_t i = 0; i< needDrawing.size(); i++) 
 	{
 			//cout<<area[i]<<endl;
-			//if((area[i]>200 &&area[i]<300)|| (area[i]>7000 && area[i] <8000)||(area[i]>11000))
+			//if(area[i]>4000 && area[i]<5000)
 			//{
 			//cout<<area[i]<<endl;
 			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
@@ -271,7 +271,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 			e++;
 			eIdx.push_back(i);
 		}	
-		if(area[i]>8000 && area[i]<11500)
+		if(area[i]>4000 && area[i]<5000)
 		{
 			r++;
 			rIdx.push_back(i);
