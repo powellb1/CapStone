@@ -4,10 +4,18 @@ pololu. www.pololu.com
 
 #include <QTRSensors.h>
 #include <PID_v1.h>
+#include <AccelStepper.h>
+
+
+
+AccelStepper stepperFR(1,2,8);
+AccelStepper stepperFL(1,3,12);
+AccelStepper stepperBR(1,5,4);
+AccelStepper stepperBL(1,6,7);
 
 
 #define NUM_SENSORS             6  // number of sensors used
-#define NUM_SAMPLES_PER_SENSOR  4  // average 4 analog samples per sensor reading
+#define NUM_SAMPLES_PER_SENSOR  1  // average 4 analog samples per sensor reading
 #define EMITTER_PIN             QTR_NO_EMITTER_PIN  // no emitter connected
 
 // sensors 0 through 5 are connected to analog inputs 0 through 5, respectively
@@ -25,6 +33,26 @@ PID myPID(&pidInput, &pidOutput, &pidSetpoint,1,0,0, DIRECT);
 
 void setup()
 {
+  
+  //Stepper test
+  stepperFR.setMaxSpeed(5000);
+  stepperFR.setAcceleration(1000);
+  stepperFR.setSpeed(5000);
+  
+  stepperFL.setMaxSpeed(5000);
+  stepperFL.setAcceleration(1000);
+  stepperFL.setSpeed(5000);
+  
+  stepperBR.setMaxSpeed(5000);
+  stepperBR.setAcceleration(1000);
+  stepperBR.setSpeed(5000);
+  
+  stepperBL.setMaxSpeed(5000);
+  stepperBL.setAcceleration(1000);
+  stepperBL.setSpeed(5000);
+  
+  
+  
   delay(500);
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);    // turn on Arduino's LED to indicate we are in calibration mode
@@ -66,12 +94,19 @@ myPID.SetMode(AUTOMATIC);
 
 void loop()
 {
+  
   // read calibrated sensor values and obtain a measure of the line position from 0 to 5000
   // To get raw sensor values, call:
   //  qtra.read(sensorValues); instead of unsigned int position = qtra.readLine(sensorValues);
   unsigned int position = qtra.readLine(sensorValues);
   pidInput = position;
   myPID.Compute();
+  
+ 
+  stepperFR.runSpeed();
+  stepperFL.runSpeed();
+  stepperBL.runSpeed();
+  stepperBR.runSpeed();
   
   //Use outputs to work with motors
   
@@ -90,5 +125,7 @@ void loop()
   Serial.println();
   Serial.println(pidOutput);
   
-  delay(250);
+//  delay(250);
+  
+  
 }
