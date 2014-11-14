@@ -48,122 +48,114 @@ bool findLarger(double d1, double d2);
 /**
  * @function main
  */
-int main( int, char** argv )
+int main(int, char** argv)
 {
 	/// Load source image and convert it to gray
 	//src = imread( argv[1], 1 );
 
-	rubiks=&iRubiks;
-	simon=&iSimon;
-	etch=&iEtch;
+	rubiks = &iRubiks;
+	simon = &iSimon;
+	etch = &iEtch;
 	ardFlag = 'F';
-	USB = open("/dev/ttyACM0",O_RDWR|O_NOCTTY);
-	memset (&tty, 0 , sizeof tty);
-	tty_old=tty;
+	USB = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
+	memset(&tty, 0, sizeof tty);
+	tty_old = tty;
 	cfsetospeed(&tty, (speed_t)9600);
 	cfsetispeed(&tty, (speed_t)9600);
 	/* Setting other Port Stuff */
-	tty.c_cflag     &=  ~PARENB;        // Make 8n1
-	tty.c_cflag     &=  ~CSTOPB;
-	tty.c_cflag     &=  ~CSIZE;
-	tty.c_cflag     |=  CS8;
+	tty.c_cflag &= ~PARENB;        // Make 8n1
+	tty.c_cflag &= ~CSTOPB;
+	tty.c_cflag &= ~CSIZE;
+	tty.c_cflag |= CS8;
 
-	tty.c_cflag     &=  ~CRTSCTS;       // no flow control
-	tty.c_cc[VMIN]      =   1;                  // read doesn't block
-	tty.c_cc[VTIME]     =   0;                  // 0.5 seconds read timeout
-	tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
+	tty.c_cflag &= ~CRTSCTS;       // no flow control
+	tty.c_cc[VMIN] = 1;                  // read doesn't block
+	tty.c_cc[VTIME] = 0;                  // 0.5 seconds read timeout
+	tty.c_cflag |= CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
 
-	
+
 
 	/* Make raw */
 	cfmakeraw(&tty);
 
 	/* Flush Port, then applies attributes */
-	tcflush( USB, TCIFLUSH );
-while(true)
-{
-	char buf = '\0';
-	/* Whole response*/
-	do
-	{
-		read( USB, &buf, 1 );
-	}
-	while(buf!='C');
-	//response.append( &buf );
-	cout <<"Camera on!: "<<buf<<endl;
 	tcflush(USB, TCIFLUSH);
-	capImage();
-}
-/*
-	buf='\0';
-	do
+	while (true)
 	{
+		char buf = '\0';
+		/* Whole response*/
+		do
+		{
+			read(USB, &buf, 1);
+		} while (buf != 'C');
+		//response.append( &buf );
+		cout << "Camera on!: " << buf << endl;
+		tcflush(USB, TCIFLUSH);
 		capImage();
-		read( USB, &buf, 1 );
 	}
-	while(buf!='C');
-*/
 
 }
 
 
 void capImage()
 {
-	capture.open( -1 );
-	char cam_buf ='\0';
-	cout<<"Capturing image"<<endl;
-	if ( ! capture.isOpened() ) { printf("--(!)Error opening video capture\n"); return; }
-	while(capture.read(src))
+	capture.open(-1);
+	char cam_buf = '\0';
+	cout << "Capturing image" << endl;
+	if (!capture.isOpened()) { printf("--(!)Error opening video capture\n"); return; }
+	while (capture.read(src))
 	{
 
 
 		//-- 3. Apply the classifier to the frame
-		if( src.empty() )
-		{ 
+		if (src.empty())
+		{
 			printf(" --(!) No captured frame -- Break!");
 			return;
 		}
 		/// Convert image to gray and blur it
 		Size s = src.size();
 		//cout<<s<<endl;
-		midPoint = Point2f(static_cast<float>(s.height/2.0),static_cast<float>(s.width/2.0));
-		cvtColor( src, src_gray, COLOR_BGR2GRAY );
-		blur( src_gray, src_gray, Size(3,3) );
+		midPoint = Point2f(static_cast<float>(s.height / 2.0), static_cast<float>(s.width / 2.0));
+		cvtColor(src, src_gray, COLOR_BGR2GRAY);
+		blur(src_gray, src_gray, Size(3, 3));
 
-		thresh_callback( 0, 0 );
-		read( USB, &cam_buf, 1 );
-		if(cam_buf=='C')
+		thresh_callback(0, 0);
+		read(USB, &cam_buf, 1);
+		if (cam_buf == 'C')
 		{
-		cout<<"Camera off!: "<<cam_buf<<endl;
-		return;
+			cout << "Camera off!: " << cam_buf << endl;
+			return;
 		}
 	}
 
 }
 
-void thresh_callback(int, void* )
+void thresh_callback(int, void*)
 {
 
 	//cout<<"Calling thresh"<<endl;
 	Mat canny_output;
 	vector<vector<Point> > contours;
-	vector<Vec4i> hierarchy;  
+	vector<Vec4i> hierarchy;
 	/// Detect edges using canny
-	Canny( src_gray, canny_output, thresh, thresh*2, 3 );
+	Canny(src_gray, canny_output, thresh, thresh * 2, 3);
 	/// Find contours
-	findContours( canny_output, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+	findContours(canny_output, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, Point(0, 0));
 
 	/// Get the moments
-	vector<Moments> mu(contours.size() );
+	vector<Moments> mu(contours.size());
 	vector<double> area(contours.size());
-	vector<double> areaSorted(contours.size());
-	vector<double> arcs(contours.size());
-	vector<double> arcSorted(contours.size());
-	for( size_t i = 0; i < contours.size(); i++ )
-	{ 
-		mu[i] = moments( contours[i], false ); 
-		area[i] = contourArea(contours[i]);	
-		arcs[i] = arcLength( contours[i], true );
+
+	//vector<double> areaSorted(contours.size());
+	//vector<double> arcs(contours.size());
+	//vector<double> arcSorted(contours.size());
+
+	for (size_t i = 0; i < contours.size(); i++)
+	{
+		mu[i] = moments(contours[i], false);
+		area[i] = contourArea(contours[i]);
+		//arcs[i] = arcLength( contours[i], true );
 	}
 
 	//areaSorted=area;
@@ -173,8 +165,8 @@ void thresh_callback(int, void* )
 	//sort(areaSorted.begin(),areaSorted.end());
 	//reverse(areaSorted.begin(),areaSorted.end());
 	//cout<<"Area vecotr length: "<<area.size()<<endl;
-	
-	if(area.size()==0 || arcs.size()==0)
+
+	if (area.size() == 0 || arcs.size() == 0)
 		return;
 	//cout<<"Contour with biggest area: "<< *max_element(area.begin(),area.end())<<endl;
 
@@ -184,38 +176,41 @@ void thresh_callback(int, void* )
 	//}	
 
 	///  Get the mass centers:
-	vector<Point2f> mc( contours.size() );
-	for( size_t i = 0; i < contours.size(); i++ )
-	{ mc[i] = Point2f( static_cast<float>(mu[i].m10/mu[i].m00) , static_cast<float>(mu[i].m01/mu[i].m00) ); }
+	vector<Point2f> mc(contours.size());
+	for (size_t i = 0; i < contours.size(); i++)
+	{
+		mc[i] = Point2f(static_cast<float>(mu[i].m10 / mu[i].m00), static_cast<float>(mu[i].m01 / mu[i].m00));
+	}
 
 	/// Draw contours
-	vector<int> needDrawing = whatObj(area, arcs,rubiks,etch,simon);
-	//if(needDrawing.size()==0)
-	//return;
+	vector<int> needDrawing = whatObj(area, arcs, rubiks, etch, simon);
+	if (needDrawing.size() == 0)
+		return;
 	//threshHold=200;
 	//Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
 
 	//for( size_t i = 0; i< contours.size(); i++ )
-	for(size_t i = 0; i< needDrawing.size(); i++) 
-	{
-		//cout<<area[i]<<endl;
-		//if(arcs[i]>800 || ((area[i]>14000 && area[i]<1500)))
-		//if(area[i]>5 && area[i]<1000)
-		//{
-			//cout<<area[i]<<endl;
-			//Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-			//drawContours( drawing, contours, (int)needDrawing[i], color, 2, 8, hierarchy, 0, Point() );
-			//circle( drawing, mc[needDrawing[i]], 4, color, -1, 8, 0);
-			Point2f test = midPoint-mc[needDrawing[i]];
-			cout<<"x "<<test.x<<endl;
-			//drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
-			//circle( drawing, mc[i], 4, color, -1, 8, 0 );
-		//}
+	//for(size_t i = 0; i< needDrawing.size(); i++) 
+	//{
+	//cout<<area[i]<<endl;
+	//if(arcs[i]>800 || ((area[i]>14000 && area[i]<1500)))
+	//if(area[i]>5 && area[i]<1000)
+	//{
+	//cout<<area[i]<<endl;
+	//Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+	//drawContours( drawing, contours, (int)needDrawing[i], color, 2, 8, hierarchy, 0, Point() );
+	//circle( drawing, mc[needDrawing[i]], 4, color, -1, 8, 0);
+	//	distances.push_back(midPoint-mc[needDrawing[i]]);
+	//	cout<<"x "<<test.x<<endl;
+	//drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
+	//circle( drawing, mc[i], 4, color, -1, 8, 0 );
+	//}
 
-	}
+	//}
 
+	if (*rubiks == 10 || *simon == 10 || *etch == 10)
+		printObject(needDrawing, mc);
 
-	
 
 
 
@@ -231,16 +226,16 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 	vector<int> rIdx;
 
 
-	for( size_t i =0; i<area.size(); i++)
+	for (size_t i = 0; i < area.size(); i++)
 	{
 		/*
 		if(area[i]>70&&area[i]<150)
 		{
-			e++;
-			eIdx.push_back(i);
+		e++;
+		eIdx.push_back(i);
 		}
-		*/	
-		if(area[i]>4000 && area[i]<5000)
+		*/
+		if (area[i]>4000 && area[i] < 5000)
 		{
 			r++;
 			rIdx.push_back(i);
@@ -248,42 +243,40 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 		/*
 		if((area[i]>200 &&area[i]<300)|| (area[i]>7000 && area[i] <8000)||(area[i]>11000 && area[i]<12000))
 		{
-			cout<<area[i]<<endl;
-			s++;
-			sIdx.push_back(i);
+		cout<<area[i]<<endl;
+		s++;
+		sIdx.push_back(i);
 		}
 		*/
-		//if(area[i]>1000)
-		//	k++;
 
 	}
-	cout<<"e: "<<e<<"\tr: "<<r<<"\ts: "<<s<<endl;
+	cout << "e: " << e << "\tr: " << r << "\ts: " << s << endl;
 
-	if(r==9)
+	if (r == 9)
 	{
 		(*rubiks)++;
-		*etch=0;
-		*simon=0;
-		printf("Rubik's cube! %d\n",*rubiks);
+		*etch = 0;
+		*simon = 0;
+		printf("Rubik's cube! %d\n", *rubiks);
 		return rIdx;
 
 	}
 
-	else if(s==3)
+	else if (s == 3)
 	{
 		(*simon)++;
-		*etch=0;
-		*rubiks=0;
-		printf("Simon! %d\n",*simon);
+		*etch = 0;
+		*rubiks = 0;
+		printf("Simon! %d\n", *simon);
 		return sIdx;
 
 	}
-	else if(e==1)
+	else if (e == 1)
 	{
 		(*etch)++;
-		*simon=0;
-		*rubiks=0;
-		printf("Etch! %d\n",*etch);
+		*simon = 0;
+		*rubiks = 0;
+		printf("Etch! %d\n", *etch);
 		return eIdx;
 	}
 	vector<int> emptyVector;
@@ -295,96 +288,123 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 void printShuffle(float Diff)
 {
 
+	float inches = 1.0;
 	//need to write how many inches to shuffle (or cm)
-	write( USB, "1", 1 );
+	write(USB, inches, 1);
 
 
-		int n = 0;
-		char buf = '\0';
+	int n = 0;
+	char buf = '\0';
 
-		/* Whole response*/
-		std::string response;
+	/* Whole response*/
+	std::string response;
 
-		do
-		{
-			read( USB, &buf, 1 );
-		}
-		while(buf!='M');
-		//response.append( &buf );
-		tcflush(USB, TCIFLUSH);
-		cout <<"Char from Arduino: "<<buf<<endl;
-		
+	do
+	{
+		read(USB, &buf, 1);
+	} while (buf != 'M');
+	//response.append( &buf );
+	tcflush(USB, TCIFLUSH);
+	cout << "Char from Arduino: " << buf << endl;
+
 }
 
-void printObject()
+void printObject(vector<int> needDrawing, vector<Point2f> mc)
 {
+	auto BigArea;
+	auto index;
 
-if(*rubiks==10)
+	if (*rubiks == 10)
 	{
-		*simon=0;
-		*etch=0;
-		*rubiks=0;
-		write( USB, "2", 1 );
-		int n = 0;
-		char buf = '\0';
-		/* Whole response*/
-		do
+		*simon = 0;
+		*etch = 0;
+		*rubiks = 0;
+		float average = 0;
+
+		for (int i = 0; i < needDrawing.size(); i++)
 		{
-			read( USB, &buf, 1 );
+			average += mc[needDrawing[i]].x;
 		}
-		while(buf!='R');
-		//response.append( &buf );
-		cout <<"Char from Arduino: "<<buf<<endl;
-		tcflush(USB, TCIFLUSH);
+
+		average = (average / (float)needDrawing.size());
+
+		if (average > 5)
+			printShuffle(average)
+		else
+		{
+			write(USB, "2", 1);
+			int n = 0;
+			char buf = '\0';
+			/* Whole response*/
+			do
+			{
+				read(USB, &buf, 1);
+			} while (buf != 'R');
+			cout << "Char from Arduino: " << buf << endl;
+			tcflush(USB, TCIFLUSH);
+		}
 
 	}
-	if(*simon==10)
+	if (*simon == 10)
 	{
-		*simon=0;
-		*etch=0;
-		*rubiks=0;
-		write( USB, "3", 1 );
 
+		*simon = 0;
+		*etch = 0;
+		*rubiks = 0;
 
-		int n = 0;
-		char buf = '\0';
-		/* Whole response*/
-		std::string response;
+		BigArea = max_element(needDrawing.begin(), needDrawing.end());
+		index = distance(begin(needDrawing), BigArea);
+		Point2f offset = midPoint - mc[needDrawing[index]];
 
-		do
+		if (offset.x > 5)
+			printShuffle(offset.x);
+		else
 		{
-			read( USB, &buf, 1 );
-		}
-		while(buf!='S');
-		//response.append( &buf );
+			write(USB, "3", 1);
+			int n = 0;
+			char buf = '\0';
+			/* Whole response*/
+			std::string response;
 
-		cout <<"Char from Arduino: "<<buf<<endl;
-		tcflush(USB, TCIFLUSH);
+			do
+			{
+				read(USB, &buf, 1);
+			} while (buf != 'S');
+			cout << "Char from Arduino: " << buf << endl;
+			tcflush(USB, TCIFLUSH);
+		}
 
 	}
 
-	if(*etch==10)
+	if (*etch == 10)
 	{
-		*simon=0;
-		*etch=0;
-		*rubiks=0;
-		write( USB, "1", 1 );
+		*simon = 0;
+		*etch = 0;
+		*rubiks = 0;
 
+		BigArea = max_element(needDrawing.begin(), needDrawing.end());
+		index = distance(begin(needDrawing), BigArea);
+		Point2f offset = midPoint - mc[needDrawing[index]];
 
-		int n = 0;
-		char buf = '\0';
-
-		/* Whole response*/
-		std::string response;
-
-		do
+		if (offset.x > 5)
+			printShuffle(offset.x);
+		else
 		{
-			read( USB, &buf, 1 );
+
+			write(USB, "1", 1);
+			int n = 0;
+			char buf = '\0';
+
+			/* Whole response*/
+			std::string response;
+
+			do
+			{
+				read(USB, &buf, 1);
+			} while (buf != 'E');
+			tcflush(USB, TCIFLUSH);
+			cout << "Char from Arduino: " << buf << endl;
 		}
-		while(buf!='E');
-		//response.append( &buf );
-		tcflush(USB, TCIFLUSH);
-		cout <<"Char from Arduino: "<<buf<<endl;
 
 	}
 
