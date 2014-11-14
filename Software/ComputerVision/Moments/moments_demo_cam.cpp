@@ -43,7 +43,8 @@ struct termios cam_tty;
 void capImage();
 void thresh_callback(int, void*);
 vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* etch, int* simon);
-bool findLarger(double d1, double d2);
+void printObject(vector<int> needDrawing, vector<Point2f> mc);
+void printShuffle(float Diff);
 
 /**
  * @function main
@@ -146,16 +147,16 @@ void thresh_callback(int, void*)
 	/// Get the moments
 	vector<Moments> mu(contours.size());
 	vector<double> area(contours.size());
-
+	vector<double> arcs(contours.size());
+	
 	//vector<double> areaSorted(contours.size());
-	//vector<double> arcs(contours.size());
 	//vector<double> arcSorted(contours.size());
 
 	for (size_t i = 0; i < contours.size(); i++)
 	{
 		mu[i] = moments(contours[i], false);
 		area[i] = contourArea(contours[i]);
-		//arcs[i] = arcLength( contours[i], true );
+		arcs[i] = arcLength( contours[i], true );
 	}
 
 	//areaSorted=area;
@@ -289,8 +290,10 @@ void printShuffle(float Diff)
 {
 
 	float inches = 1.0;
+	char * float2str;
+	sprintf(float2str,"%f",inches);
 	//need to write how many inches to shuffle (or cm)
-	write(USB, inches, 1);
+	write(USB, float2str, 1);
 
 
 	int n = 0;
@@ -311,8 +314,8 @@ void printShuffle(float Diff)
 
 void printObject(vector<int> needDrawing, vector<Point2f> mc)
 {
-	auto BigArea;
-	auto index;
+	//auto BigArea;
+	int index;
 
 	if (*rubiks == 10)
 	{
@@ -329,7 +332,11 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		average = (average / (float)needDrawing.size());
 
 		if (average > 5)
-			printShuffle(average)
+		{
+			write(USB, "X", 1);
+			cout<<offset.x<<endl;
+			printShuffle(average);
+		}
 		else
 		{
 			write(USB, "2", 1);
@@ -352,12 +359,16 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		*etch = 0;
 		*rubiks = 0;
 
-		BigArea = max_element(needDrawing.begin(), needDrawing.end());
-		index = distance(begin(needDrawing), BigArea);
+		//BigArea = max_element(needDrawing.begin(), needDrawing.end());
+		index = distance(needDrawing.begin(), max_element(needDrawing.begin(), needDrawing.end()));
 		Point2f offset = midPoint - mc[needDrawing[index]];
 
 		if (offset.x > 5)
+		{
+			write(USB, "X", 1);
+			cout<<offset.x<<endl;
 			printShuffle(offset.x);
+		}
 		else
 		{
 			write(USB, "3", 1);
@@ -382,12 +393,16 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		*etch = 0;
 		*rubiks = 0;
 
-		BigArea = max_element(needDrawing.begin(), needDrawing.end());
-		index = distance(begin(needDrawing), BigArea);
+		//BigArea = max_element(needDrawing.begin(), needDrawing.end());
+		index = distance(needDrawing.begin(), max_element(needDrawing.begin(), needDrawing.end()));
 		Point2f offset = midPoint - mc[needDrawing[index]];
 
 		if (offset.x > 5)
+		{
+			write(USB, "X", 1);
+			cout<<offset.x<<endl;
 			printShuffle(offset.x);
+		}
 		else
 		{
 
