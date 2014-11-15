@@ -236,7 +236,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 		eIdx.push_back(i);
 		}
 		*/
-		if (area[i]>4000 && area[i] < 5000)
+		if (area[i]>5000 && area[i] < 6000)
 		{
 			r++;
 			rIdx.push_back(i);
@@ -289,9 +289,13 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 void printShuffle(float Diff)
 {
 
+	cout<<"printing shuffle"<<endl;
 	float inches = 1.0;
-	char * float2str;
-	sprintf(float2str,"%f",inches);
+	static char float2str[1];
+	//cout<<"before sprint"<<endl;
+	sprintf(float2str,"%f",Diff);
+	cout<<"after sprint"<<endl;
+	cout<<float2str<<endl;
 	//need to write how many inches to shuffle (or cm)
 	write(USB, float2str, 1);
 
@@ -326,15 +330,15 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 
 		for (int i = 0; i < needDrawing.size(); i++)
 		{
-			average += mc[needDrawing[i]].x;
+			average += midPoint.x-mc[needDrawing[i]].x;
 		}
 
-		average = (average / (float)needDrawing.size());
+		average = (float)(average /needDrawing.size());
 
 		if (average > 5)
 		{
 			write(USB, "X", 1);
-			cout<<offset.x<<endl;
+			cout<<average<<endl;
 			printShuffle(average);
 		}
 		else

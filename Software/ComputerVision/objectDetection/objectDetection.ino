@@ -14,18 +14,17 @@
 int pinI1=8;//define I1 interface
 int pinI2=11;//define I2 interface 
 int speedpinA=9;//enable motor A
-int pinI3=12;//define I3 interface 
-int pinI4=13;//define I4 interface 
-int speedpinB=10;//enable motor B
+int speedpinB=140;//enable motor B
 int spead =255;//define the spead of motor
-int etch = 13;
-int rubiks = 11;
+int etch = 10;
+int rubiks = 12;
 int incomingByte = 0;
 int pot=22;
 int trg=3;
 int echo=2;
-boolean inRange = true;
 boolean camOn=true;
+boolean completed = false;
+boolean inRange = false;
 
 
 NewPing sonar(trg,echo,MAX_DISTANCE);
@@ -35,8 +34,6 @@ void setup(){
   pinMode(pinI1,OUTPUT);
   pinMode(pinI2,OUTPUT);
   pinMode(speedpinA,OUTPUT);
-  pinMode(pinI3,OUTPUT);
-  pinMode(pinI4,OUTPUT);
   pinMode(speedpinB,OUTPUT);
 
   pinMode(etch,OUTPUT);
@@ -51,49 +48,70 @@ void loop()
 
   delay(50);
   unsigned int uS = sonar.ping(); // Send ping, get ping time in microseconds (uS).
+  if(!completed)
+  {
+    if(((uS/US_ROUNDTRIP_CM)>=11 && (uS/US_ROUNDTRIP_CM)<=12) && !inRange)
+    {
+      inRange = true; 
+      forward();
+      Serial.write('C');
+    }
+  }
+  //digitalWrite(pot,HIGH);
+  //delay(5000);
+  //digitalWrite(pot,LOW);
+
+
+  //Serial.println("Moving camera forward");
+  //do
+  //{
+  while(inRange && !completed)
+  {
+    while(Serial.available()>0)
+    {
+      incomingByte = Serial.read();
+      if(incomingByte=='X')
+      {
+        digitalWrite(etch,HIGH);
+        shuffle();
+      }
+      else if(incomingByte>48 && incomingByte<52)
+      {
+        whatObj(incomingByte);
+      }
+    }
+
+  }
+
+  if(completed)
+  {
+    backward();
+    Serial.write('C');
+  }
+
+
+  //Serial.flush();
+  //uS = sonar.ping();
   //Serial.print("Ping: ");
   //Serial.print(uS / US_ROUNDTRIP_CM); // Convert ping time to distance in cm and print result (0 = outside set distance range)
   //Serial.println("cm");
-  if((uS/US_ROUNDTRIP_CM)>=11 && (uS/US_ROUNDTRIP_CM)<=12)
-  {
-    //digitalWrite(pot,HIGH);
-    //delay(5000);
-    //digitalWrite(pot,LOW);
-    forward();
-    Serial.write('C');
-    //Serial.println('C');
-    do
-    {
-      if(Serial.available()>0)
-      {
-        incomingByte = Serial.read()-48;
-        if(incomingByte=='M')
-        {
-          //Movement code
-        }
-        else
-        {
-          whatObj();
-        }
-      }
-      uS = sonar.ping();
-    }
-    while((uS/US_ROUNDTRIP_CM)==11);
-    Serial.write('C');
-    backward();
-  }
+  //}
+  //while((uS/US_ROUNDTRIP_CM)>=11 && (uS/US_ROUNDTRIP_CM)<=12);
+  //Serial.write('C');
+  //Serial.println("Moving camera back");
+
+
 
 
 }
 
 
-void whatObj()
+void whatObj(int incomingByte)
 {
 
   //if(Serial.available()>0)
   //{
-  incomingByte = Serial.read()-48;
-  Serial.flush();
+  incomingByte = incomingByte-48;
   switch(incomingByte)
   {
   case 1:
@@ -103,6 +121,7 @@ void whatObj()
       digitalWrite(etch,LOW);
       delay(3000);
       Serial.write('E');
+      completed = true;
       break;
     } 
   case 2:
@@ -112,6 +131,7 @@ void whatObj()
       digitalWrite(rubiks,LOW);
       delay(3000);
       Serial.write('R');
+      completed = true;
       break;
     } 
   case 3:
@@ -123,6 +143,7 @@ void whatObj()
       digitalWrite(rubiks,LOW);
       delay(3000);
       Serial.write('S');
+      completed = true;
       break;
     } 
   default :
@@ -159,6 +180,21 @@ void backward()//
   digitalWrite(pinI2,HIGH);//turn DC Motor A move clockwise
   digitalWrite(pinI1,LOW);
 }
+
+void shuffle()
+{
+  //while(Serial.available()>0)
+  Serial.parseFloat();
+
+  delay(1000);
+  Serial.write('M');
+  digitalWrite(etch,LOW);
+
+}
+
+
+
+
 
 
 

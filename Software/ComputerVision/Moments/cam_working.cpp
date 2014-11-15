@@ -155,8 +155,8 @@ void thresh_callback(int, void* )
 
 	/// Draw contours
 	vector<int> needDrawing = whatObj(area, arcs,rubiks,etch,simon);
-	if(needDrawing.size()==0)
-	return;
+	//if(needDrawing.size()==0)
+	//return;
 	//threshHold=200;
 	Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
 	
@@ -164,7 +164,7 @@ void thresh_callback(int, void* )
 	for(size_t i = 0; i< needDrawing.size(); i++) 
 	{
 			//cout<<area[i]<<endl;
-			//if(area[i]>4000 && area[i]<5000)
+			//if(area[i]>5000)
 			//{
 			//cout<<area[i]<<endl;
 			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
@@ -271,7 +271,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 			e++;
 			eIdx.push_back(i);
 		}	
-		if(area[i]>4000 && area[i]<5000)
+		if(area[i]>5000 && area[i]<6000)
 		{
 			r++;
 			rIdx.push_back(i);
