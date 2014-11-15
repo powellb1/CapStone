@@ -5,7 +5,9 @@ pololu. www.pololu.com
 #include <QTRSensors.h>
 #include <PID_v1.h>
 #include <AccelStepper.h>
-
+int LF;
+int interflag =0;
+unsigned long timer;
 
 
 AccelStepper stepperFR(1,2,8);
@@ -89,9 +91,6 @@ pidInput = qtra.readLine(sensorValues);
 myPID.SetMode(AUTOMATIC);
 }
 
-
-
-
 void loop()
 {
   
@@ -102,6 +101,137 @@ void loop()
   pidInput = position;
   myPID.Compute();
   
+ if ((LF < 2000) && (interflag == 1)){
+   //making a left turn once returning to an intersection that roadie turn left at
+   interflag = 0;
+   //turn left
+      timer = millis();
+   while ((millis() - timer) < 2000){
+     stepperFL.runSpeed();
+     stepperFR.runSpeed();
+     stepperBL.runSpeed();
+     stepperBR.runSpeed();
+   } 
+   //turn left 
+   stepperFL.setSpeed(-1000);
+   stepperFR.setSpeed(1000);
+   stepperBL.setSpeed(-1000);
+   stepperBR.setSpeed(1000);  
+   timer = millis();
+   while ((millis() - timer) < 2000){
+     stepperFL.runSpeed();
+     stepperFR.runSpeed();
+     stepperBL.runSpeed();
+     stepperBR.runSpeed();
+   }
+   stepperFL.setSpeed(3000);
+   stepperFR.setSpeed(3000);
+   stepperBL.setSpeed(3000);
+   stepperBR.setSpeed(3000);
+   
+ }else if ((LF > 5000) && (interflag == 1)){
+   //making a right turn once coming back to an intersection that roadie turned right at.
+   interflag = 0;
+  //turn right        
+   timer = millis();
+   while ((millis() - timer) < 2000){
+     stepperFL.runSpeed();
+     stepperFR.runSpeed();
+     stepperBL.runSpeed();
+     stepperBR.runSpeed();
+   }
+   //turn right
+   stepperFL.setSpeed(1000);
+   stepperFR.setSpeed(-1000);
+   stepperBL.setSpeed(1000);
+   stepperBR.setSpeed(-1000);  
+   timer = millis();
+   while ((millis() - timer) < 2000){
+     stepperFL.runSpeed();
+     stepperFR.runSpeed();
+     stepperBL.runSpeed();
+     stepperBR.runSpeed();
+   }
+   stepperFL.setSpeed(3000);
+   stepperFR.setSpeed(3000);
+   stepperBL.setSpeed(3000);
+   stepperBR.setSpeed(3000); 
+  
+ }else if(LF < 2000){  
+   timer = millis();
+   while ((millis() - timer) < 2000){
+     stepperFL.runSpeed();
+     stepperFR.runSpeed();
+     stepperBL.runSpeed();
+     stepperBR.runSpeed();
+   } 
+   //read line senors and if it dects line after it sets flag
+   //readline
+   if(LFI > 3000){
+     interflag = 1;
+   }
+   //turn left 
+   stepperFL.setSpeed(-1000);
+   stepperFR.setSpeed(1000);
+   stepperBL.setSpeed(-1000);
+   stepperBR.setSpeed(1000);  
+   timer = millis();
+   while ((millis() - timer) < 2000){
+     stepperFL.runSpeed();
+     stepperFR.runSpeed();
+     stepperBL.runSpeed();
+     stepperBR.runSpeed();
+   }
+   stepperFL.setSpeed(3000);
+   stepperFR.setSpeed(3000);
+   stepperBL.setSpeed(3000);
+   stepperBR.setSpeed(3000);   
+ }else if(LF >= 5000){
+      
+   timer = millis();
+   while ((millis() - timer) < 2000){
+     stepperFL.runSpeed();
+     stepperFR.runSpeed();
+     stepperBL.runSpeed();
+     stepperBR.runSpeed();
+   }
+  
+   
+   if(LFI > 3000){
+     interflag = 1;
+   }
+   //turn right
+   stepperFL.setSpeed(1000);
+   stepperFR.setSpeed(-1000);
+   stepperBL.setSpeed(1000);
+   stepperBR.setSpeed(-1000);  
+   timer = millis();
+   while ((millis() - timer) < 2000){
+     stepperFL.runSpeed();
+     stepperFR.runSpeed();
+     stepperBL.runSpeed();
+     stepperBR.runSpeed();
+   }
+   stepperFL.setSpeed(3000);
+   stepperFR.setSpeed(3000);
+   stepperBL.setSpeed(3000);
+   stepperBR.setSpeed(3000); 
+  
+ }else if((LF >= 4000) &&(LF < 5000){
+  //make corrections to right
+  //speeds up right motors and slows down the left motors
+  stepperFL.setSpeed(stepperFL.speed() - 100);
+  stepperFR.setSpeed(stepperFR.speed() + 100);
+  stepperBL.setSpeed(stepperBL.speed() - 100);
+  stepperBR.setSpeed(stepperBR.speed() + 100);
+ }else if ((LF < 3000) && (LF >= 2000)){  
+  //make corrections to the left
+  //sppeds up left motors and slows down the right motors 
+  stepperFL.setSpeed(stepperFL.speed() + 100);
+  stepperFR.setSpeed(stepperFR.speed() - 100);
+  stepperBL.setSpeed(stepperBL.speed() + 100);
+  stepperBR.setSpeed(stepperBR.speed() - 100);
+ }
  
   stepperFR.runSpeed();
   stepperFL.runSpeed();
@@ -109,7 +239,6 @@ void loop()
   stepperBR.runSpeed();
   
   //Use outputs to work with motors
-  
   
   // print the sensor values as numbers from 0 to 1000, where 0 means maximum reflectance and
   // 1000 means minimum reflectance, followed by the line position
