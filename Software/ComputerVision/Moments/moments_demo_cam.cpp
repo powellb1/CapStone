@@ -117,7 +117,7 @@ void capImage()
 		/// Convert image to gray and blur it
 		Size s = src.size();
 		//cout<<s<<endl;
-		midPoint = Point2f(static_cast<float>(s.height / 2.0), static_cast<float>(s.width / 2.0));
+		midPoint = Point2f(static_cast<float>(s.width / 2.0), static_cast<float>(s.height / 2.0));
 		cvtColor(src, src_gray, COLOR_BGR2GRAY);
 		blur(src_gray, src_gray, Size(3, 3));
 
@@ -229,26 +229,25 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 
 	for (size_t i = 0; i < area.size(); i++)
 	{
-		/*
-		if(area[i]>70&&area[i]<150)
+		
+		if(area[i]>74000&&area[i]<76000)
 		{
-		e++;
-		eIdx.push_back(i);
+			e++;
+			eIdx.push_back(i);
 		}
-		*/
-		if (area[i]>5000 && area[i] < 6000)
+		
+		if (area[i]>9000 && area[i] < 10500)
 		{
 			r++;
 			rIdx.push_back(i);
 		}
-		/*
-		if((area[i]>200 &&area[i]<300)|| (area[i]>7000 && area[i] <8000)||(area[i]>11000 && area[i]<12000))
+		
+		if((arcs[i]>800 && arcs[i]<900)||area[i]>5000)
 		{
-		cout<<area[i]<<endl;
-		s++;
-		sIdx.push_back(i);
+			s++;
+			sIdx.push_back(i);
 		}
-		*/
+		
 
 	}
 	cout << "e: " << e << "\tr: " << r << "\ts: " << s << endl;
@@ -263,7 +262,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 
 	}
 
-	else if (s == 3)
+	else if (s == 5)
 	{
 		(*simon)++;
 		*etch = 0;
@@ -311,7 +310,7 @@ void printShuffle(float Diff)
 		read(USB, &buf, 1);
 	} while (buf != 'M');
 	//response.append( &buf );
-	tcflush(USB, TCIFLUSH);
+	//tcflush(USB, TCIFLUSH);
 	cout << "Char from Arduino: " << buf << endl;
 
 }
@@ -334,11 +333,11 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		}
 
 		average = (float)(average /needDrawing.size());
-
-		if (average > 5)
+		cout<<average<<endl;
+		if (abs(average) > 5)
 		{
 			write(USB, "X", 1);
-			cout<<average<<endl;
+			
 			printShuffle(average);
 		}
 		else
@@ -352,7 +351,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 				read(USB, &buf, 1);
 			} while (buf != 'R');
 			cout << "Char from Arduino: " << buf << endl;
-			tcflush(USB, TCIFLUSH);
+			//tcflush(USB, TCIFLUSH);
 		}
 
 	}
@@ -367,10 +366,11 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		index = distance(needDrawing.begin(), max_element(needDrawing.begin(), needDrawing.end()));
 		Point2f offset = midPoint - mc[needDrawing[index]];
 
-		if (offset.x > 5)
+		cout<<offset.x<<endl;
+		if (abs(offset.x) > 5)
 		{
 			write(USB, "X", 1);
-			cout<<offset.x<<endl;
+
 			printShuffle(offset.x);
 		}
 		else
@@ -386,7 +386,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 				read(USB, &buf, 1);
 			} while (buf != 'S');
 			cout << "Char from Arduino: " << buf << endl;
-			tcflush(USB, TCIFLUSH);
+			//tcflush(USB, TCIFLUSH);
 		}
 
 	}
@@ -401,10 +401,10 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		index = distance(needDrawing.begin(), max_element(needDrawing.begin(), needDrawing.end()));
 		Point2f offset = midPoint - mc[needDrawing[index]];
 
-		if (offset.x > 5)
+		cout<<offset.x<<endl;
+		if (abs(offset.x) > 5)
 		{
 			write(USB, "X", 1);
-			cout<<offset.x<<endl;
 			printShuffle(offset.x);
 		}
 		else
@@ -421,7 +421,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 			{
 				read(USB, &buf, 1);
 			} while (buf != 'E');
-			tcflush(USB, TCIFLUSH);
+			//tcflush(USB, TCIFLUSH);
 			cout << "Char from Arduino: " << buf << endl;
 		}
 

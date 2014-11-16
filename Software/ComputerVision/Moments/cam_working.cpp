@@ -21,6 +21,7 @@
 using namespace cv;
 using namespace std;
 
+Point2f midPoint;
 Mat src; Mat src_gray;
 int thresh = 20;
 int max_thresh = 255;
@@ -79,8 +80,10 @@ int main( int, char** argv )
 	if ( ! capture.isOpened() ) { printf("--(!)Error opening video capture\n"); return -1; }
 	while( capture.read(src) )
 	{
-
-
+	Size s = src.size();
+	cout<<s<<endl;
+	midPoint = Point2f(static_cast<float>(s.width / 2.0), static_cast<float>(s.height / 2.0));
+	cout<<"MP X: "<<midPoint.x<<"MP Y: "<<midPoint.y<<endl;
 		//-- 3. Apply the classifier to the frame
 		if( src.empty() )
 		{ 
@@ -163,13 +166,14 @@ void thresh_callback(int, void* )
 	//for( size_t i = 0; i< contours.size(); i++ )
 	for(size_t i = 0; i< needDrawing.size(); i++) 
 	{
-			//cout<<area[i]<<endl;
+			//cout<<area[i]<<endl; 
 			//if(area[i]>5000)
 			//{
 			//cout<<area[i]<<endl;
 			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
 			drawContours( drawing, contours, (int)needDrawing[i], color, 2, 8, hierarchy, 0, Point() );
 			circle( drawing, mc[needDrawing[i]], 4, color, -1, 8, 0);
+			cout<<"X: "<<midPoint.x-mc[needDrawing[i]].x<<endl;
 			//drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
 			//circle( drawing, mc[i], 4, color, -1, 8, 0 );
 			//}
@@ -179,75 +183,7 @@ void thresh_callback(int, void* )
 	namedWindow( "Contours", WINDOW_AUTOSIZE );
 	imshow( "Contours", drawing );
 
-	if(*rubiks==10)
-	{
-		*simon=0;
-		*etch=0;
-		*rubiks=0;
-		write( USB, "2", 1 );
-		int n = 0;
-		char buf = '\0';
-		cout<<"sending out 2"<<endl;
-		/* Whole response*/
-		do
-		{
-			read( USB, &buf, 1 );
-		}
-		while(buf!='K');
-		//response.append( &buf );
-		cout <<"Char from Arduino: "<<buf<<endl;
-		tcflush(USB, TCIFLUSH);
-
-	}
-	if(*simon==10)
-	{
-		*simon=0;
-		*etch=0;
-		*rubiks=0;
-		write( USB, "3", 1 );
-
-
-		int n = 0;
-		char buf = '\0';
-		/* Whole response*/
-		std::string response;
-
-		do
-		{
-			read( USB, &buf, 1 );
-		}
-		while(buf!='K');
-		//response.append( &buf );
-
-		cout <<"Char from Arduino: "<<buf<<endl;
-
-
-	}
-
-	if(*etch==10)
-	{
-		*simon=0;
-		*etch=0;
-		*rubiks=0;
-		write( USB, "1", 1 );
-
-
-		int n = 0;
-		char buf = '\0';
-
-		/* Whole response*/
-		std::string response;
-
-		do
-		{
-			read( USB, &buf, 1 );
-		}
-		while(buf!='K');
-		//response.append( &buf );
-
-		cout <<"Char from Arduino: "<<buf<<endl;
-
-	}
+	
 
 
 	
@@ -266,17 +202,17 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 	for( size_t i =0; i<area.size(); i++)
 	{
 
-		if(area[i]>70&&area[i]<200)
+		if(area[i]>74000&&area[i]<76000)
 		{
 			e++;
 			eIdx.push_back(i);
 		}	
-		if(area[i]>5000 && area[i]<6000)
+		if(area[i]>9000 && area[i]<10500)
 		{
 			r++;
 			rIdx.push_back(i);
 		}
-		if((area[i]>200 &&area[i]<300)|| (area[i]>7000 && area[i] <8000)||(area[i]>11000))
+		if((arcs[i]>800 && arcs[i]<900)||area[i]>5000)
 		{
 			s++;
 			sIdx.push_back(i);
