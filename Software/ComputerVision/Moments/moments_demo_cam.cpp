@@ -4,6 +4,7 @@
  * @author OpenCV team
  */
 
+#define IN_PER_PIXEL 0.00859375
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -230,19 +231,17 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 	for (size_t i = 0; i < area.size(); i++)
 	{
 		
-		if(area[i]>74000&&area[i]<76000)
+		if(area[i]>60000&&area[i]<76000)
 		{
 			e++;
 			eIdx.push_back(i);
-		}
-		
-		if (area[i]>9000 && area[i] < 10500)
+		}	
+		if(area[i]>8000 && area[i]<10500)
 		{
 			r++;
 			rIdx.push_back(i);
 		}
-		
-		if((arcs[i]>800 && arcs[i]<900)||area[i]>5000)
+		if((area[i]>7000 && area[i]<8500))
 		{
 			s++;
 			sIdx.push_back(i);
@@ -262,7 +261,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 
 	}
 
-	else if (s == 5)
+	else if (s == 4)
 	{
 		(*simon)++;
 		*etch = 0;
@@ -289,10 +288,10 @@ void printShuffle(float Diff)
 {
 
 	cout<<"printing shuffle"<<endl;
-	float inches = 1.0;
+	float inches = Diff*IN_PER_PIXEL;
 	static char float2str[1];
 	//cout<<"before sprint"<<endl;
-	sprintf(float2str,"%f",Diff);
+	sprintf(float2str,"%f",inches);
 	cout<<"after sprint"<<endl;
 	cout<<float2str<<endl;
 	//need to write how many inches to shuffle (or cm)
@@ -361,17 +360,20 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		*simon = 0;
 		*etch = 0;
 		*rubiks = 0;
-
+		float average = 0;
 		//BigArea = max_element(needDrawing.begin(), needDrawing.end());
-		index = distance(needDrawing.begin(), max_element(needDrawing.begin(), needDrawing.end()));
-		Point2f offset = midPoint - mc[needDrawing[index]];
+		for (int i = 0; i < needDrawing.size(); i++)
+		{
+			average += midPoint.x-mc[needDrawing[i]].x;
+		}
 
-		cout<<offset.x<<endl;
-		if (abs(offset.x) > 5)
+		average = (float)(average /needDrawing.size());
+		cout<<average<<endl;
+		if (abs(average) > 5)
 		{
 			write(USB, "X", 1);
-
-			printShuffle(offset.x);
+			
+			printShuffle(average);
 		}
 		else
 		{

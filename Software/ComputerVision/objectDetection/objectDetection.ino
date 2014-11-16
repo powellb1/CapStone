@@ -49,46 +49,19 @@ void loop()
 
   delay(50);
   float uS = sonar.ping(); // Send ping, get ping time in microseconds (uS).
-  //Serial.println((float)(uS/US_ROUNDTRIP_CM));
-  if(!completed)
+  Serial.println((float)(uS/US_ROUNDTRIP_CM));
+  if(!completed) //this completed flag would be changed to turned around or something like that
   {
     approach(uS);
 
   }
-  /*
-  while(inRange && !completed)
-   {
-   while(Serial.available()>0)
-   {
-   incomingByte = Serial.read();
-   if(incomingByte=='X')
-   {
-   digitalWrite(LED,HIGH);
-   shuffle();
-   digitalWrite(LED,LOW);
-   }
-   else if(incomingByte>48 && incomingByte<52)
-   {
-   whatObj(incomingByte);
-   }
-   
-   }
-   
-   }
-   
-   
-   if(completed)
-   {
-   backward();
-   Serial.write('C');
-   }
-   */
 
 }
 
+//called when approaching object.
 void approach(float uS)
 {
-  if(((float)(uS/US_ROUNDTRIP_CM)>=4 && (float)(uS/US_ROUNDTRIP_CM)<=4.2) && !inRange)
+  if(((float)(uS/US_ROUNDTRIP_CM)>=4.1 && (float)(uS/US_ROUNDTRIP_CM)<=4.3) && !inRange)
   {
     inRange = true; 
     forward();
@@ -120,11 +93,10 @@ void approach(float uS)
 
   }
 
-
-
-
 }
 
+//used to determine where we're moving to. Need to put in values as to how far to move
+//laterally
 void whatObj(int incomingByte)
 {
   incomingByte = incomingByte-48;
@@ -178,8 +150,6 @@ void forward()
 {
   analogWrite(speedpinA,spead);//input a simulation value to set the speed
   analogWrite(speedpinB,spead);
-  //digitalWrite(pinI4,HIGH);//turn DC Motor B move clockwise
-  //digitalWrite(pinI3,LOW);
   digitalWrite(pinI2,LOW);//turn DC Motor A move anticlockwise
   digitalWrite(pinI1,HIGH);
 }
@@ -187,17 +157,14 @@ void backward()//
 {
   analogWrite(speedpinA,spead);//input a simulation value to set the speed
   analogWrite(speedpinB,spead);
-  //digitalWrite(pinI4,LOW);//turn DC Motor B move anticlockwise
-  //digitalWrite(pinI3,HIGH);
   digitalWrite(pinI2,HIGH);//turn DC Motor A move clockwise
   digitalWrite(pinI1,LOW);
 }
 
 void shuffle()
 {
-  //while(Serial.available()>0)
   Serial.parseFloat();
-
+  //Do movement things
   delay(1000);
   Serial.write('M');
   digitalWrite(etch,LOW);
