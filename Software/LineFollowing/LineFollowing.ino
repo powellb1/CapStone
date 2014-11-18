@@ -4,24 +4,16 @@ pololu. www.pololu.com
 
 #include <QTRSensors.h>
 #include <PID_v1.h>
-#include <AccelStepper.h>
-int LF;
-int interflag =0;
-unsigned long timer;
 
 
-AccelStepper stepperFR(1,2,8);
-AccelStepper stepperFL(1,3,12);
-AccelStepper stepperBR(1,5,4);
-AccelStepper stepperBL(1,6,7);
 
 
-#define NUM_SENSORS             6  // number of sensors used
-#define NUM_SAMPLES_PER_SENSOR  1  // average 4 analog samples per sensor reading
+#define NUM_SENSORS             8  // number of sensors used
+#define NUM_SAMPLES_PER_SENSOR  2  // average 4 analog samples per sensor reading
 #define EMITTER_PIN             QTR_NO_EMITTER_PIN  // no emitter connected
 
 // sensors 0 through 5 are connected to analog inputs 0 through 5, respectively
-QTRSensorsAnalog qtra((unsigned char[]) {0, 1, 2, 3, 4, 5},                 
+QTRSensorsAnalog qtra((unsigned char[]) {8, 9, 10, 11, 12, 13, 14, 15},                 
   NUM_SENSORS, NUM_SAMPLES_PER_SENSOR, EMITTER_PIN);
 unsigned int sensorValues[NUM_SENSORS];
 
@@ -30,7 +22,7 @@ unsigned int sensorValues[NUM_SENSORS];
 double pidSetpoint, pidInput, pidOutput;
 
 //Give the PID pointers to the variables along with the current constants
-PID myPID(&pidInput, &pidOutput, &pidSetpoint,1,0,0, DIRECT);
+PID myPID(&pidInput, &pidOutput, &pidSetpoint, 2, 0.5, 2, DIRECT);
 
 
 void setup()
