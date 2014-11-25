@@ -158,7 +158,7 @@ void setup()
   
   StepperFR.setMaxSpeed(5000.0);
   StepperFR.setAcceleration(1000.0);
-  StepperFR.setSpeed(-1000);
+  StepperFR.setSpeed(1000);
   
   StepperBR.setMaxSpeed(5000.0);
   StepperBR.setAcceleration(1000.0);
@@ -166,7 +166,7 @@ void setup()
   
   StepperBL.setMaxSpeed(5000.0);
   StepperBL.setAcceleration(1000.0);
-  StepperBL.setSpeed(1000); 
+  StepperBL.setSpeed(-1000); 
 }
 
 void loop()
@@ -195,12 +195,13 @@ void loop()
                 ---
             (Linesenors) 
     */
-    delay(3000);
+   
     StepperFL.runSpeed();
     StepperFR.runSpeed();
     StepperBL.runSpeed();
     StepperBR.runSpeed();
-    forward();
+
+
    
 }
 
