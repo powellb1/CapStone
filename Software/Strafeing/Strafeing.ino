@@ -60,26 +60,33 @@ void strafe(float inc){
       StepperFL.setSpeed(1000);
       StepperBR.setSpeed(-1000);
       StepperBL.setSpeed(-1000);
-      
+
+  //Run for time based on inches
+  timer = millis();
+  while ((millis() - timer) < (1000*(inc+0.3778)/3.9533)){      
     StepperFL.runSpeed();
     StepperFR.runSpeed();
     StepperBL.runSpeed();
     StepperBR.runSpeed();
-    //Delay amount of seconds based on inches provied
-    delay(1000*(inc+0.3778)/3.9533);
-  }else{
+  }
+  
+  }
+  
+  else{
     
       StepperFR.setSpeed(-1000);
       StepperFL.setSpeed(-1000);
       StepperBR.setSpeed(1000);
       StepperBL.setSpeed(1000);
     
+    //Run for time based off inches
+  timer = millis();
+  while ((millis() - timer) < (1000*(inc+0.3778)/3.9533)){      
     StepperFL.runSpeed();
     StepperFR.runSpeed();
     StepperBL.runSpeed();
     StepperBR.runSpeed();
-    //Delay amount of seconds based on inches provied
-    delay(1000*(inc+0.3778)/3.9533);
+  }
   }
   
 }
@@ -104,12 +111,14 @@ void setup()
   StepperBL.setMaxSpeed(5000.0);
   StepperBL.setAcceleration(1000.0);
   StepperBL.setSpeed(-1000); 
+  
+  strafe(5);
 }
 
 void loop()
 {
    
-strafe(1);
+
    
 }
 
