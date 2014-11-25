@@ -5,7 +5,7 @@
 #include "utility/Adafruit_PWMServoDriver.h"
 
 #define rubixStrafeFromCenter 3.25
-
+int etch = 22;
 
 Adafruit_MotorShield AFMSbot(0x61); // Rightmost jumper closed
 Adafruit_MotorShield AFMStop(0x60); // Default address, no jumpers
@@ -133,7 +133,10 @@ void setup()
 void loop()
 {
    
-
+        digitalWrite(etch,HIGH);
+        delay(2000);
+        digitalWrite(etch,LOW);
+        delay(2000);
    
 }
 

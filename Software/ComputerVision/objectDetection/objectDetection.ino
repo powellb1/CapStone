@@ -1,4 +1,10 @@
 #include <NewPing.h>
+#include <AccelStepper.h>
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+#include "utility/Adafruit_PWMServoDriver.h"
+
+#define rubixStrafeFromCenter 3.25
 
 /*
   ObjectDetection
@@ -27,6 +33,14 @@ boolean camOn=true;
 boolean completed = false;
 boolean inRange = false;
 
+//time it takes to make the turn needs to be changed
+//testing is need to map everything at the speed we plan on running it at
+AccelStepper StepperFR(forwardstep1, backwardstep1);
+AccelStepper StepperFL(forwardstep2, backwardstep2);
+AccelStepper StepperBR(forwardstep3, backwardstep3);
+AccelStepper StepperBL(forwardstep4, backwardstep4);
+
+
 
 NewPing sonar(trg,echo,MAX_DISTANCE);
 
@@ -49,7 +63,7 @@ void loop()
 
   delay(50);
   float uS = sonar.ping(); // Send ping, get ping time in microseconds (uS).
-  Serial.println((float)(uS/US_ROUNDTRIP_CM));
+  //Serial.println((float)(uS/US_ROUNDTRIP_CM));
   if(!completed) //this completed flag would be changed to turned around or something like that
   {
     approach(uS);
@@ -170,6 +184,34 @@ void shuffle()
   digitalWrite(etch,LOW);
 
 }
+
+void strafe(float inc){
+
+  if(inc < 0){
+    StepperFR.setSpeed(1000);
+    StepperFL.setSpeed(1000);
+    StepperBR.setSpeed(-1000);
+    StepperBL.setSpeed(-1000);
+  }
+
+  else{
+    StepperFR.setSpeed(-1000);
+    StepperFL.setSpeed(-1000);
+    StepperBR.setSpeed(1000);
+    StepperBL.setSpeed(1000);
+
+  }
+  //Run for time based on inches
+  long timer = millis();
+  while ((millis() - timer) < (1000*(abs(inc)+0.3778)/3.9533)){      
+    StepperFL.runSpeed();
+    StepperFR.runSpeed();
+    StepperBL.runSpeed();
+    StepperBR.runSpeed();
+  }
+}
+
+
 
 
 

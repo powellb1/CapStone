@@ -360,7 +360,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		*simon = 0;
 		*etch = 0;
 		*rubiks = 0;
-		float average = 0;
+		cfloat average = 0;
 		//BigArea = max_element(needDrawing.begin(), needDrawing.end());
 		for (int i = 0; i < needDrawing.size(); i++)
 		{
