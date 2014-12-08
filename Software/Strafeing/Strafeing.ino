@@ -126,17 +126,17 @@ void setup()
   StepperBL.setMaxSpeed(5000.0);
   StepperBL.setAcceleration(1000.0);
   StepperBL.setSpeed(-1000); 
-  
-  strafe(-rubixStrafeFromCenter);
+
 }
 
 void loop()
 {
    
-        digitalWrite(etch,HIGH);
-        delay(2000);
-        digitalWrite(etch,LOW);
-        delay(2000);
+    while(Serial.available()>0)
+  {
+  float inc = Serial.parseFloat();  
+  strafe(inc);
+  }
    
 }
 
