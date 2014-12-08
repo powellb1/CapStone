@@ -188,28 +188,7 @@ void thresh_callback(int, void*)
 	vector<int> needDrawing = whatObj(area, arcs, rubiks, etch, simon);
 	if (needDrawing.size() == 0)
 		return;
-	//threshHold=200;
-	//Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
-
-	//for( size_t i = 0; i< contours.size(); i++ )
-	//for(size_t i = 0; i< needDrawing.size(); i++) 
-	//{
-	//cout<<area[i]<<endl;
-	//if(arcs[i]>800 || ((area[i]>14000 && area[i]<1500)))
-	//if(area[i]>5 && area[i]<1000)
-	//{
-	//cout<<area[i]<<endl;
-	//Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-	//drawContours( drawing, contours, (int)needDrawing[i], color, 2, 8, hierarchy, 0, Point() );
-	//circle( drawing, mc[needDrawing[i]], 4, color, -1, 8, 0);
-	//	distances.push_back(midPoint-mc[needDrawing[i]]);
-	//	cout<<"x "<<test.x<<endl;
-	//drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
-	//circle( drawing, mc[i], 4, color, -1, 8, 0 );
-	//}
-
-	//}
-
+	
 	if (*rubiks == 10 || *simon == 10 || *etch == 10)
 		printObject(needDrawing, mc);
 
@@ -236,7 +215,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 			e++;
 			eIdx.push_back(i);
 		}	
-		if(area[i]>8000 && area[i]<10500)
+		if(area[i]>7000 && area[i]<10000)
 		{
 			r++;
 			rIdx.push_back(i);
@@ -333,7 +312,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 
 		average = (float)(average /needDrawing.size());
 		cout<<average<<endl;
-		if (abs(average) > 5)
+		if (abs(average) > 30)
 		{
 			write(USB, "X", 1);
 			
@@ -360,7 +339,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		*simon = 0;
 		*etch = 0;
 		*rubiks = 0;
-		cfloat average = 0;
+		float average = 0;
 		//BigArea = max_element(needDrawing.begin(), needDrawing.end());
 		for (int i = 0; i < needDrawing.size(); i++)
 		{
@@ -369,7 +348,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 
 		average = (float)(average /needDrawing.size());
 		cout<<average<<endl;
-		if (abs(average) > 5)
+		if (abs(average) > 30)
 		{
 			write(USB, "X", 1);
 			
@@ -404,7 +383,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		Point2f offset = midPoint - mc[needDrawing[index]];
 
 		cout<<offset.x<<endl;
-		if (abs(offset.x) > 5)
+		if (abs(offset.x) > 30)
 		{
 			write(USB, "X", 1);
 			printShuffle(offset.x);

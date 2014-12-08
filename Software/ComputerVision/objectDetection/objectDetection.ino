@@ -22,23 +22,19 @@ int pinI2=11;//define I2 interface
 int speedpinA=9;//enable motor A
 int speedpinB=140;//enable motor B
 int spead =255;//define the spead of motor
-int etch = 10;
-int rubiks = 12;
+int etch = 28;
+int rubiks = 30;
 int incomingByte = 0;
-int pot=22;
-int trg=3;
-int echo=2;
-int LED = 4;
+int trg=23;
+int echo=22;
+int LED = 32;
 boolean camOn=true;
 boolean completed = false;
 boolean inRange = false;
 
 //time it takes to make the turn needs to be changed
 //testing is need to map everything at the speed we plan on running it at
-AccelStepper StepperFR(forwardstep1, backwardstep1);
-AccelStepper StepperFL(forwardstep2, backwardstep2);
-AccelStepper StepperBR(forwardstep3, backwardstep3);
-AccelStepper StepperBL(forwardstep4, backwardstep4);
+
 
 
 
@@ -185,31 +181,7 @@ void shuffle()
 
 }
 
-void strafe(float inc){
 
-  if(inc < 0){
-    StepperFR.setSpeed(1000);
-    StepperFL.setSpeed(1000);
-    StepperBR.setSpeed(-1000);
-    StepperBL.setSpeed(-1000);
-  }
-
-  else{
-    StepperFR.setSpeed(-1000);
-    StepperFL.setSpeed(-1000);
-    StepperBR.setSpeed(1000);
-    StepperBL.setSpeed(1000);
-
-  }
-  //Run for time based on inches
-  long timer = millis();
-  while ((millis() - timer) < (1000*(abs(inc)+0.3778)/3.9533)){      
-    StepperFL.runSpeed();
-    StepperFR.runSpeed();
-    StepperBL.runSpeed();
-    StepperBR.runSpeed();
-  }
-}
 
 
 

@@ -165,9 +165,9 @@ void thresh_callback(int, void* )
 	//for(size_t i = 0; i< needDrawing.size(); i++) 
 	{
 			//cout<<area[i]<<endl; 
-			if((arcs[i]>800 && arcs[i]<900 )||(area[i]>7000 && area[i]<9000))//&& area[i]<110000)
+
+			if((area[i]>7000 && area[i]<8500))
 			{
-			if(area[i]>7000 && area[i]<9000)
 			cout<<area[i]<<endl;
 			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
 			//drawContours( drawing, contours, (int)needDrawing[i], color, 2, 8, hierarchy, 0, Point() );
@@ -206,7 +206,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 			e++;
 			eIdx.push_back(i);
 		}	
-		if(area[i]>8000 && area[i]<10500)
+		if(area[i]>7000 && area[i]<10000)
 		{
 			r++;
 			rIdx.push_back(i);
