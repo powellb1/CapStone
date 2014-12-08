@@ -310,9 +310,37 @@ void loop()
           
         }
         
+        //If on a sensor further right, then pidOutputs doubled. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
+        else if(position > 5500){
+          leftSideSpeed = leftSideSpeed + 2*pidOutput;
+          rightSideSpeed = rightSideSpeed - 2*pidOutput;
+          
+           StepperFR.setSpeed(rightSideSpeed);
+           StepperFL.setSpeed(-leftSideSpeed);
+           StepperBR.setSpeed(rightSideSpeed);
+           StepperBL.setSpeed(-leftSideSpeed); 
+          
+          
+        }
+        
+        
+          
           else if(position < 4000){
           leftSideSpeed = leftSideSpeed - pidOutput;
           rightSideSpeed = rightSideSpeed + pidOutput;
+          
+           StepperFR.setSpeed(rightSideSpeed);
+           StepperFL.setSpeed(-leftSideSpeed);
+           StepperBR.setSpeed(rightSideSpeed);
+           StepperBL.setSpeed(-leftSideSpeed); 
+          
+          
+        }
+        
+          //If on a sensor further left, double PID Outputs. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
+          else if(position < 2500){
+          leftSideSpeed = leftSideSpeed - 2*pidOutput;
+          rightSideSpeed = rightSideSpeed + 2*pidOutput;
           
            StepperFR.setSpeed(rightSideSpeed);
            StepperFL.setSpeed(-leftSideSpeed);
