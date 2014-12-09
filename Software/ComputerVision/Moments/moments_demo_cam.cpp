@@ -271,7 +271,6 @@ void printShuffle(float Diff)
 	static char float2str[1];
 	//cout<<"before sprint"<<endl;
 	sprintf(float2str,"%f",inches);
-	cout<<"after sprint"<<endl;
 	cout<<float2str<<endl;
 	//need to write how many inches to shuffle (or cm)
 	write(USB, float2str, 1);

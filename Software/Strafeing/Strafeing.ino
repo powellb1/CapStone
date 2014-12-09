@@ -58,32 +58,29 @@ AccelStepper StepperBL(forwardstep4, backwardstep4);
 
 void strafe(float inc){
   
-  Serial.println("Enter strafe function");
+
   if(inc < 0){
-    Serial.println("Enter if clause");
+
       StepperFR.setSpeed(1000);
       StepperFL.setSpeed(1000);
       StepperBR.setSpeed(-1000);
       StepperBL.setSpeed(-1000);
-Serial.println("speeds set");
+
 
   //Run for time based on inches
  long timer = millis();
-  Serial.println("Timer started");
   Serial.println(timer);
   while ((millis() - timer) < (1000*(abs(inc)+0.3778)/3.9533)){      
     StepperFL.runSpeed();
     StepperFR.runSpeed();
     StepperBL.runSpeed();
     StepperBR.runSpeed();
-    Serial.println("running");
   }
   
   }
   
   else{
     
-    Serial.println("Enter else strafe");
       StepperFR.setSpeed(-1000);
       StepperFL.setSpeed(-1000);
       StepperBR.setSpeed(1000);
@@ -127,16 +124,16 @@ void setup()
   StepperBL.setAcceleration(1000.0);
   StepperBL.setSpeed(-1000); 
   
-  strafe(-rubixStrafeFromCenter);
+
 }
 
 void loop()
 {
-   
-        digitalWrite(etch,HIGH);
-        delay(2000);
-        digitalWrite(etch,LOW);
-        delay(2000);
+   while(Serial.available()>0)
+   {
+    float inc = Serial.parseFloat();
+  strafe(inc);
+   }
    
 }
 
