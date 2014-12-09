@@ -178,19 +178,19 @@ void setup()
    
   StepperFL.setMaxSpeed(5000.0);
   StepperFL.setAcceleration(1000.0);
-  StepperFL.setSpeed(1000);
+  StepperFL.setSpeed(4000);
   
   StepperFR.setMaxSpeed(5000.0);
   StepperFR.setAcceleration(1000.0);
-  StepperFR.setSpeed(-1000);
+  StepperFR.setSpeed(-4000);
   
   StepperBR.setMaxSpeed(5000.0);
   StepperBR.setAcceleration(1000.0);
-  StepperBR.setSpeed(-1000);
+  StepperBR.setSpeed(-4000);
   
   StepperBL.setMaxSpeed(5000.0);
   StepperBL.setAcceleration(1000.0);
-  StepperBL.setSpeed(1000); 
+  StepperBL.setSpeed(4000); 
   
   //Sensor array start/////////////////////////////
   /////////////////////////////////////////////////
@@ -225,16 +225,13 @@ void setup()
   
   //PID "init"//
     //init PID variables
-pidSetpoint = 3600;
-pidInput = qtra.readLine(sensorValues);
+  pidSetpoint = 3600;
+  pidInput = qtra.readLine(sensorValues);
 
-//start up PID
-myPID.SetMode(AUTOMATIC);
+  //start up PID
+  myPID.SetMode(AUTOMATIC);
 
-//End PID init//
-
-
-
+  //End PID init//
 }
 
 void loop()
@@ -264,99 +261,55 @@ void loop()
                 ---
             (Linesenors) 
     */
-    
-    StepperFL.runSpeed();
-    StepperFR.runSpeed();
-    StepperBL.runSpeed();
-    StepperBR.runSpeed();
-    
       //Read sensor array, put it into PID input, and compute.
       unsigned int position = qtra.readLine(sensorValues);
       pidInput = position;
       myPID.Compute();
-  
-  
-      if(position == 3500){
-        turnAround();
-      }
-  
-      else if(sensorValues[0] < 100 && sensorValues[1] < 100 && sensorValues[2] < 100){
-        
+      
+      if(sensorValues[0] < 100 && sensorValues[1] < 100 && sensorValues[2] < 100){
         lturn();
-      }
-      
-      else if(sensorValues[5] < 100 && sensorValues[6] < 100 && sensorValues[7] < 100){
-        
+      }else if(sensorValues[5] < 100 && sensorValues[6] < 100 && sensorValues[7] < 100){
         rturn();
-      }
-      
-      
+      }else{
       //else clause is standard line following
-      else{
-        
-      //Keep calling run for motors
+      //Corrections
+        if(position > 6500){
+           leftSideSpeed = leftSideSpeed + 2*pidOutput;
+           rightSideSpeed = rightSideSpeed - 2*pidOutput;
+           StepperFR.setSpeed(rightSideSpeed);
+           StepperFL.setSpeed(-leftSideSpeed);
+           StepperBR.setSpeed(rightSideSpeed);
+           StepperBL.setSpeed(-leftSideSpeed);
+        }else if(position > 3700){
+        //If on a sensor further right, then pidOutputs doubled. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
+           leftSideSpeed = leftSideSpeed + pidOutput;
+           rightSideSpeed = rightSideSpeed - pidOutput;
+           StepperFR.setSpeed(rightSideSpeed);
+           StepperFL.setSpeed(-leftSideSpeed);
+           StepperBR.setSpeed(rightSideSpeed);
+           StepperBL.setSpeed(-leftSideSpeed); 
+        }else if(position < 1500){
+           leftSideSpeed = leftSideSpeed - 2*pidOutput;
+           rightSideSpeed = rightSideSpeed + 2*pidOutput;
+           StepperFR.setSpeed(rightSideSpeed);
+           StepperFL.setSpeed(-leftSideSpeed);
+           StepperBR.setSpeed(rightSideSpeed);
+           StepperBL.setSpeed(-leftSideSpeed); 
+        }else if(position < 3500){
+          //If on a sensor further left, double PID Outputs. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
+           leftSideSpeed = leftSideSpeed - pidOutput;
+           rightSideSpeed = rightSideSpeed + pidOutput;
+           StepperFR.setSpeed(rightSideSpeed);
+           StepperFL.setSpeed(-leftSideSpeed);
+           StepperBR.setSpeed(rightSideSpeed);
+           StepperBL.setSpeed(-leftSideSpeed);     
+        } 
+      }
+      //run motors
       StepperFL.runSpeed();
       StepperFR.runSpeed();
       StepperBL.runSpeed();
       StepperBR.runSpeed();
-      
-      //Corrections
-        if(position > 3600){
-          leftSideSpeed = leftSideSpeed + pidOutput;
-          rightSideSpeed = rightSideSpeed - pidOutput;
-          
-           StepperFR.setSpeed(rightSideSpeed);
-           StepperFL.setSpeed(-leftSideSpeed);
-           StepperBR.setSpeed(rightSideSpeed);
-           StepperBL.setSpeed(-leftSideSpeed); 
-          
-          
-        }
-        
-        //If on a sensor further right, then pidOutputs doubled. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
-        else if(position > 6500){
-          leftSideSpeed = leftSideSpeed + 2*pidOutput;
-          rightSideSpeed = rightSideSpeed - 2*pidOutput;
-          
-           StepperFR.setSpeed(rightSideSpeed);
-           StepperFL.setSpeed(-leftSideSpeed);
-           StepperBR.setSpeed(rightSideSpeed);
-           StepperBL.setSpeed(-leftSideSpeed); 
-          
-          
-        }
-        
-        
-          
-          else if(position < 3600){
-          leftSideSpeed = leftSideSpeed - pidOutput;
-          rightSideSpeed = rightSideSpeed + pidOutput;
-          
-           StepperFR.setSpeed(rightSideSpeed);
-           StepperFL.setSpeed(-leftSideSpeed);
-           StepperBR.setSpeed(rightSideSpeed);
-           StepperBL.setSpeed(-leftSideSpeed); 
-          
-          
-        }
-        
-          //If on a sensor further left, double PID Outputs. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
-          else if(position < 1500){
-          leftSideSpeed = leftSideSpeed - 2*pidOutput;
-          rightSideSpeed = rightSideSpeed + 2*pidOutput;
-          
-           StepperFR.setSpeed(rightSideSpeed);
-           StepperFL.setSpeed(-leftSideSpeed);
-           StepperBR.setSpeed(rightSideSpeed);
-           StepperBL.setSpeed(-leftSideSpeed); 
-          
-          
-        }
-        
-        
-      }
-  
-
   
    
 }
