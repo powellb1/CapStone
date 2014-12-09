@@ -19,7 +19,7 @@ unsigned int sensorValues[NUM_SENSORS];
 double pidSetpoint, pidInput, pidOutput;
 
 //Define motor speed variables for PID
-int static leftSideSpeed, rightSideSpeed;
+int leftSideSpeed, rightSideSpeed;
 
 //Give the PID pointers to the variables along with the current constants
 PID myPID(&pidInput, &pidOutput, &pidSetpoint,20,0,0, DIRECT);
@@ -248,6 +248,7 @@ void loop(){
     myPID.Compute();
   
   
+  
     if(position < pidSetpoint){
 
                  rightSideSpeed = rightSideSpeed + pidOutput;
@@ -258,7 +259,7 @@ void loop(){
            StepperBR.setSpeed(-rightSideSpeed);
            StepperBL.setSpeed(leftSideSpeed);
 
-Serial.println(position);
+
       
     }
     
@@ -272,7 +273,10 @@ Serial.println(position);
            StepperBL.setSpeed(leftSideSpeed);
             
     }
-    
+    Serial.print(leftSideSpeed);
+    Serial.print("\t");
+    Serial.print(rightSideSpeed);
+    Serial.println();
     
             
      
