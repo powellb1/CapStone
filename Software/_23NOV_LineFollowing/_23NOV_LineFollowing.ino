@@ -18,7 +18,7 @@
 #define EMITTER_PIN             2  // emitter is controlled by digital pin 2
 
 // sensors 0 through 7 are connected to analog inputs 0 through 7, respectively
-QTRSensorsAnalog qtra((unsigned char[]) {8,9,10,11,12,13,14,15}, 
+QTRSensorsAnalog qtra((unsigned char[]) {0,1,2,3,4,5,6,7}, 
   NUM_SENSORS, NUM_SAMPLES_PER_SENSOR, EMITTER_PIN);
 unsigned int sensorValues[NUM_SENSORS];
 
@@ -225,7 +225,7 @@ void setup()
   
   //PID "init"//
     //init PID variables
-pidSetpoint = 4000;
+pidSetpoint = 3600;
 pidInput = qtra.readLine(sensorValues);
 
 //start up PID
@@ -233,10 +233,13 @@ myPID.SetMode(AUTOMATIC);
 
 //End PID init//
 
+
+
 }
 
 void loop()
 {
+  Serial.println("in loop");
     // Change direction at the limits
     // add in line following for the turns just call the functions
     // rturn for right turn
@@ -298,7 +301,7 @@ void loop()
       StepperBR.runSpeed();
       
       //Corrections
-        if(position > 4000){
+        if(position > 3600){
           leftSideSpeed = leftSideSpeed + pidOutput;
           rightSideSpeed = rightSideSpeed - pidOutput;
           
@@ -310,9 +313,37 @@ void loop()
           
         }
         
-          else if(position < 4000){
+        //If on a sensor further right, then pidOutputs doubled. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
+        else if(position > 6500){
+          leftSideSpeed = leftSideSpeed + 2*pidOutput;
+          rightSideSpeed = rightSideSpeed - 2*pidOutput;
+          
+           StepperFR.setSpeed(rightSideSpeed);
+           StepperFL.setSpeed(-leftSideSpeed);
+           StepperBR.setSpeed(rightSideSpeed);
+           StepperBL.setSpeed(-leftSideSpeed); 
+          
+          
+        }
+        
+        
+          
+          else if(position < 3600){
           leftSideSpeed = leftSideSpeed - pidOutput;
           rightSideSpeed = rightSideSpeed + pidOutput;
+          
+           StepperFR.setSpeed(rightSideSpeed);
+           StepperFL.setSpeed(-leftSideSpeed);
+           StepperBR.setSpeed(rightSideSpeed);
+           StepperBL.setSpeed(-leftSideSpeed); 
+          
+          
+        }
+        
+          //If on a sensor further left, double PID Outputs. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
+          else if(position < 1500){
+          leftSideSpeed = leftSideSpeed - 2*pidOutput;
+          rightSideSpeed = rightSideSpeed + 2*pidOutput;
           
            StepperFR.setSpeed(rightSideSpeed);
            StepperFL.setSpeed(-leftSideSpeed);
