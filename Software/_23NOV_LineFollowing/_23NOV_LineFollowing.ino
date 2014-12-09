@@ -1,10 +1,3 @@
-
-
-
-//WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//VALUES FOR MOVEMENT MIGHT BE BACKWARDS.
-//BECAREFUL WHEN TESTING
-//HAS NOT BEEN TESTED YET
 #include <AccelStepper.h>
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
@@ -18,7 +11,7 @@
 #define EMITTER_PIN             2  // emitter is controlled by digital pin 2
 
 // sensors 0 through 7 are connected to analog inputs 0 through 7, respectively
-QTRSensorsAnalog qtra((unsigned char[]) {0,1,2,3,4,5,6,7}, 
+QTRSensorsAnalog qtra((unsigned char[]) {8,9,10,11,12,13,14,15}, 
   NUM_SENSORS, NUM_SAMPLES_PER_SENSOR, EMITTER_PIN);
 unsigned int sensorValues[NUM_SENSORS];
 
@@ -99,7 +92,6 @@ void rturn(){
   }
   reverse();
 }
-
 void lturn(){
   timer = millis();
   while ((millis() - timer) < 2000){
@@ -137,35 +129,30 @@ void turnAround(){
   } 
   reverse();
 }
-
 void forward(){
- StepperFR.setSpeed(1000);
- StepperFL.setSpeed(-1000);
- StepperBR.setSpeed(1000);
- StepperBL.setSpeed(-1000); 
+  StepperFR.setSpeed(1000);
+  StepperFL.setSpeed(-1000);
+  StepperBR.setSpeed(1000);
+  StepperBL.setSpeed(-1000); 
 }
-
 void reverse(){
- StepperFR.setSpeed(-1000);
- StepperFL.setSpeed(1000);
- StepperBR.setSpeed(-1000);
- StepperBL.setSpeed(1000);  
+  StepperFR.setSpeed(-1000);
+  StepperFL.setSpeed(1000);
+  StepperBR.setSpeed(-1000);
+  StepperBL.setSpeed(1000);  
 }
-
 void strafe(float inc){
   if(inc < 0){
       StepperFR.setSpeed(-1000);
       StepperFL.setSpeed(1000);
       StepperBR.setSpeed(1000);
       StepperBL.setSpeed(-1000);
-  }else{
-    
+  }else{   
       StepperFR.setSpeed(1000);
       StepperFL.setSpeed(-1000);
       StepperBR.setSpeed(-1000);
       StepperBL.setSpeed(1000);
   }
- //inc to seconds  
 }
 
 void setup()
@@ -219,10 +206,8 @@ void setup()
   }
   Serial.println();
   Serial.println();
-  
   //Sensor Array Finish////////////////////////
   /////////////////////////////////////////////
-  
   //PID "init"//
     //init PID variables
   pidSetpoint = 3600;
@@ -309,8 +294,6 @@ void loop()
       StepperFL.runSpeed();
       StepperFR.runSpeed();
       StepperBL.runSpeed();
-      StepperBR.runSpeed();
-  
-   
+      StepperBR.runSpeed();   
 }
 
