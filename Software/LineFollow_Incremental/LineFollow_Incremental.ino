@@ -10,7 +10,7 @@
 #define EMITTER_PIN             QTR_NO_EMITTER_PIN  // emitter is controlled by digital pin 2
 
 // sensors 0 through 7 are connected to analog inputs 0 through 7, respectively
-QTRSensorsAnalog qtra((unsigned char[]) {0,1,2,3,4,5,6,7}, 
+QTRSensorsAnalog qtra((unsigned char[]) {8,9,10,11,12,13,14,15}, 
   NUM_SENSORS, NUM_SAMPLES_PER_SENSOR, EMITTER_PIN);
 unsigned int sensorValues[NUM_SENSORS];
 
@@ -22,7 +22,7 @@ double pidSetpoint, pidInput, pidOutput;
 int static leftSideSpeed, rightSideSpeed;
 
 //Give the PID pointers to the variables along with the current constants
-PID myPID(&pidInput, &pidOutput, &pidSetpoint,3,0,1, DIRECT);
+PID myPID(&pidInput, &pidOutput, &pidSetpoint,20,0,0, DIRECT);
 
 
 
@@ -224,7 +224,7 @@ void setup()
   
   //PID "init"//
     //init PID variables
-pidSetpoint = 3600;
+pidSetpoint = 3000;
 pidInput = qtra.readLine(sensorValues);
 
 //start up PID
@@ -232,12 +232,49 @@ myPID.SetMode(AUTOMATIC);
 
 //End PID init//
 
+    StepperFL.runSpeed();
+    StepperFR.runSpeed();
+    StepperBL.runSpeed();
+    StepperBR.runSpeed();
 
 
 }
 
 
 void loop(){
+  
+    int position = qtra.readLine(sensorValues);
+    pidInput = position;
+    myPID.Compute();
+  
+  
+    if(position < pidSetpoint){
+
+                 rightSideSpeed = rightSideSpeed + pidOutput;
+           leftSideSpeed = 0 + rightSideSpeed/2;
+
+           StepperFR.setSpeed(-rightSideSpeed);
+           StepperFL.setSpeed(leftSideSpeed);
+           StepperBR.setSpeed(-rightSideSpeed);
+           StepperBL.setSpeed(leftSideSpeed);
+
+Serial.println(position);
+      
+    }
+    
+    else if(position > pidSetpoint){
+                
+           leftSideSpeed = leftSideSpeed + pidOutput;
+           rightSideSpeed = leftSideSpeed/2;
+           StepperFR.setSpeed(-rightSideSpeed);
+           StepperFL.setSpeed(leftSideSpeed);
+           StepperBR.setSpeed(-rightSideSpeed);
+           StepperBL.setSpeed(leftSideSpeed);
+            
+    }
+    
+    
+            
      
     StepperFL.runSpeed();
     StepperFR.runSpeed();
