@@ -22,7 +22,7 @@ double pidSetpoint, pidInput, pidOutput;
 int static leftSideSpeed, rightSideSpeed;
 
 //Give the PID pointers to the variables along with the current constants
-PID myPID(&pidInput, &pidOutput, &pidSetpoint,3,0,1, DIRECT);
+PID myPID(&pidInput, &pidOutput, &pidSetpoint,50,0,0, DIRECT);
 
 Adafruit_MotorShield AFMSbot(0x61); // Rightmost jumper closed
 Adafruit_MotorShield AFMStop(0x60); // Default address, no jumpers
@@ -221,7 +221,7 @@ void setup()
 
 void loop()
 {
-  Serial.println("in loop");
+  //Serial.println("in loop");
     // Change direction at the limits
     // add in line following for the turns just call the functions
     // rturn for right turn
@@ -251,11 +251,12 @@ void loop()
       pidInput = position;
       myPID.Compute();
       
-      if(sensorValues[0] < 100 && sensorValues[1] < 100 && sensorValues[2] < 100){
+      /*if(sensorValues[0] < 100 && sensorValues[1] < 100 && sensorValues[2] < 100){
         lturn();
       }else if(sensorValues[5] < 100 && sensorValues[6] < 100 && sensorValues[7] < 100){
         rturn();
       }else{
+        */
       //else clause is standard line following
       //Corrections
         if(position > 6500){
@@ -265,7 +266,7 @@ void loop()
            StepperFL.setSpeed(-leftSideSpeed);
            StepperBR.setSpeed(rightSideSpeed);
            StepperBL.setSpeed(-leftSideSpeed);
-        }else if(position > 3700){
+        }else if(position > 3900){
         //If on a sensor further right, then pidOutputs doubled. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
            leftSideSpeed = leftSideSpeed + pidOutput;
            rightSideSpeed = rightSideSpeed - pidOutput;
@@ -280,7 +281,7 @@ void loop()
            StepperFL.setSpeed(-leftSideSpeed);
            StepperBR.setSpeed(rightSideSpeed);
            StepperBL.setSpeed(-leftSideSpeed); 
-        }else if(position < 3500){
+        }else if(position < 3300){
           //If on a sensor further left, double PID Outputs. FIRST ON LIST TO DEBUG - Works with or against benefit of pidCompute, don't know which yet.
            leftSideSpeed = leftSideSpeed - pidOutput;
            rightSideSpeed = rightSideSpeed + pidOutput;
@@ -289,11 +290,12 @@ void loop()
            StepperBR.setSpeed(rightSideSpeed);
            StepperBL.setSpeed(-leftSideSpeed);     
         } 
-      }
+//      }
       //run motors
       StepperFL.runSpeed();
       StepperFR.runSpeed();
       StepperBL.runSpeed();
       StepperBR.runSpeed();   
+      
 }
 
