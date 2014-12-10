@@ -166,7 +166,7 @@ void thresh_callback(int, void* )
 	{
 			//cout<<area[i]<<endl; 
 
-			if((area[i]>7000 && area[i]<8500))
+			if((area[i]>1000))
 			{
 			cout<<area[i]<<endl;
 			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
@@ -211,7 +211,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 			r++;
 			rIdx.push_back(i);
 		}
-		if((area[i]>7000 && area[i]<8500))
+		if((area[i]>7000 && area[i]<9000)|| (area[i]>11000 && area[i] <12000))
 		{
 			s++;
 			sIdx.push_back(i);
@@ -233,7 +233,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 
 	}
 
-	else if(s==4)
+	else if(s==5)
 	{
 		(*simon)++;
 		*etch=0;

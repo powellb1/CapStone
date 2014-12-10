@@ -189,7 +189,7 @@ void thresh_callback(int, void*)
 	if (needDrawing.size() == 0)
 		return;
 	
-	if (*rubiks == 10 || *simon == 10 || *etch == 10)
+	if (*rubiks == 5 || *simon == 5 || *etch == 5)
 		printObject(needDrawing, mc);
 
 
@@ -220,11 +220,12 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 			r++;
 			rIdx.push_back(i);
 		}
-		if((area[i]>7000 && area[i]<8500))
+		if((area[i]>7000 && area[i]<9000)|| (area[i]>11000 && area[i] <12000))
 		{
 			s++;
 			sIdx.push_back(i);
 		}
+		
 		
 
 	}
@@ -240,7 +241,7 @@ vector<int> whatObj(vector<double> area, vector<double> arcs, int* rubiks, int* 
 
 	}
 
-	else if (s == 4)
+	else if (s == 5)
 	{
 		(*simon)++;
 		*etch = 0;
@@ -297,7 +298,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 	//auto BigArea;
 	int index;
 
-	if (*rubiks == 10)
+	if (*rubiks == 5)
 	{
 		*simon = 0;
 		*etch = 0;
@@ -332,7 +333,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 		}
 
 	}
-	if (*simon == 10)
+	if (*simon == 5)
 	{
 
 		*simon = 0;
@@ -371,7 +372,7 @@ void printObject(vector<int> needDrawing, vector<Point2f> mc)
 
 	}
 
-	if (*etch == 10)
+	if (*etch == 5)
 	{
 		*simon = 0;
 		*etch = 0;
