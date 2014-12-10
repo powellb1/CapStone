@@ -7,23 +7,16 @@
 
 #define NUM_SENSORS             8  // number of sensors used
 #define NUM_SAMPLES_PER_SENSOR  2  // average 2 analog samples per sensor reading
-#define EMITTER_PIN             QTR_NO_EMITTER_PIN  // emitter is controlled by digital pin 2
+#define EMITTER_PIN             QTR_NO_EMITTER_PIN
 
 // sensors 0 through 7 are connected to analog inputs 0 through 7, respectively
 QTRSensorsAnalog qtra((unsigned char[]) {8,9,10,11,12,13,14,15}, 
   NUM_SENSORS, NUM_SAMPLES_PER_SENSOR, EMITTER_PIN);
 unsigned int sensorValues[NUM_SENSORS];
 
-
-//Define PID variables
-double pidSetpoint, pidInput, pidOutput;
-
 //Define motor speed variables for PID
-int leftSideSpeed, rightSideSpeed;
-
-//Give the PID pointers to the variables along with the current constants
-PID myPID(&pidInput, &pidOutput, &pidSetpoint,20,0,0, DIRECT);
-
+int leftSpeed, rightSpeed;
+int baseSpeed = 1000;
 
 
 Adafruit_MotorShield AFMSbot(0x61); // Rightmost jumper closed
@@ -39,7 +32,6 @@ Adafruit_StepperMotor *stepperfl = AFMStop.getStepper(400, 2); //Top M3 and M4
 Adafruit_StepperMotor *stepperbr = AFMSbot.getStepper(400, 1); //Bottom M1 and M2
 Adafruit_StepperMotor *stepperbl = AFMSbot.getStepper(400, 2); //Bottom M3 and M4
 unsigned int timer;
-
 
 void forwardstep1() {  
   stepperfr->onestep(FORWARD, DOUBLE);
@@ -69,13 +61,12 @@ void backwardstep4() {
 }
 
 
-
+//time it takes to make the turn needs to be changed
+//testing is need to map everything at the speed we plan on running it at
 AccelStepper StepperFR(forwardstep1, backwardstep1);
 AccelStepper StepperFL(forwardstep2, backwardstep2);
 AccelStepper StepperBR(forwardstep3, backwardstep3);
 AccelStepper StepperBL(forwardstep4, backwardstep4);
-
-
 
 void rturn(){
   timer = millis();
@@ -98,7 +89,6 @@ void rturn(){
   }
   reverse();
 }
-
 void lturn(){
   timer = millis();
   while ((millis() - timer) < 2000){
@@ -136,60 +126,53 @@ void turnAround(){
   } 
   reverse();
 }
-
 void forward(){
- StepperFR.setSpeed(1000);
- StepperFL.setSpeed(-1000);
- StepperBR.setSpeed(1000);
- StepperBL.setSpeed(-1000); 
+  StepperFR.setSpeed(1000);
+  StepperFL.setSpeed(-1000);
+  StepperBR.setSpeed(1000);
+  StepperBL.setSpeed(-1000); 
 }
-
 void reverse(){
- StepperFR.setSpeed(-1000);
- StepperFL.setSpeed(1000);
- StepperBR.setSpeed(-1000);
- StepperBL.setSpeed(1000);  
+  StepperFR.setSpeed(-1000);
+  StepperFL.setSpeed(1000);
+  StepperBR.setSpeed(-1000);
+  StepperBL.setSpeed(1000);  
 }
-
 void strafe(float inc){
   if(inc < 0){
       StepperFR.setSpeed(-1000);
       StepperFL.setSpeed(1000);
       StepperBR.setSpeed(1000);
       StepperBL.setSpeed(-1000);
-  }else{
-    
+  }else{   
       StepperFR.setSpeed(1000);
       StepperFL.setSpeed(-1000);
       StepperBR.setSpeed(-1000);
       StepperBL.setSpeed(1000);
   }
- //inc to seconds  
 }
+
 
 void setup()
 {  
   AFMSbot.begin(); // Start the bottom shield
   AFMStop.begin(); // Start the top shield
-  
-  leftSideSpeed = 4000;
-  rightSideSpeed = 4000;
    
   StepperFL.setMaxSpeed(5000.0);
   StepperFL.setAcceleration(1000.0);
-  StepperFL.setSpeed(1000);
+  StepperFL.setSpeed(4000);
   
   StepperFR.setMaxSpeed(5000.0);
   StepperFR.setAcceleration(1000.0);
-  StepperFR.setSpeed(-1000);
+  StepperFR.setSpeed(-4000);
   
   StepperBR.setMaxSpeed(5000.0);
   StepperBR.setAcceleration(1000.0);
-  StepperBR.setSpeed(-1000);
+  StepperBR.setSpeed(-4000);
   
   StepperBL.setMaxSpeed(5000.0);
   StepperBL.setAcceleration(1000.0);
-  StepperBL.setSpeed(1000); 
+  StepperBL.setSpeed(4000); 
   
   //Sensor array start/////////////////////////////
   /////////////////////////////////////////////////
@@ -218,71 +201,98 @@ void setup()
   }
   Serial.println();
   Serial.println();
-  
   //Sensor Array Finish////////////////////////
   /////////////////////////////////////////////
-  
-  //PID "init"//
-    //init PID variables
-pidSetpoint = 3000;
-pidInput = qtra.readLine(sensorValues);
-
-//start up PID
-myPID.SetMode(AUTOMATIC);
-
-//End PID init//
-
-    StepperFL.runSpeed();
+      StepperFL.runSpeed();
     StepperFR.runSpeed();
     StepperBL.runSpeed();
     StepperBR.runSpeed();
-
-
+  
 }
-
 
 void loop(){
   
-    int position = qtra.readLine(sensorValues);
-    pidInput = position;
-    myPID.Compute();
+  // Sensor array (from viewpoint of chassis going in reverse where line follower is leading.)
+  // Array: 7 6 5 4  3  2  1  0
+  // Error: 4 3 2 1 -1 -2 -3 -4
   
- int leftSS = map(leftSideSpeed, 0, 5000, 1000, 4000);
- int rightSS = map(rightSideSpeed, 0, 5000, 1000, 4000);
-   
-    if(position < pidSetpoint){
-
-                 rightSS = rightSideSpeed + pidOutput;
-           leftSS = 0 + rightSideSpeed/2;
-
-           StepperFR.setSpeed(-rightSideSpeed);
-           StepperFL.setSpeed(leftSideSpeed);
-           StepperBR.setSpeed(-rightSideSpeed);
-           StepperBL.setSpeed(leftSideSpeed);
-
-
-      
-    }
+  int totalError = 0;
+  unsigned int position1 = qtra.readLine(sensorValues);
+  
+  if(sensorValues[0] < 40){
     
-    else if(position > pidSetpoint){
-                
-           leftSS = leftSideSpeed + pidOutput;
-           rightSS = leftSideSpeed/2;
-           StepperFR.setSpeed(-rightSideSpeed);
-           StepperFL.setSpeed(leftSideSpeed);
-           StepperBR.setSpeed(-rightSideSpeed);
-           StepperBL.setSpeed(leftSideSpeed);
-            
-    }
-    Serial.print(leftSideSpeed);
-    Serial.print("\t");
-    Serial.print(rightSideSpeed);
-    Serial.println();
+    totalError -= 4;
     
-            
-     
-    StepperFL.runSpeed();
+  }
+  
+    if(sensorValues[1] < 40){
+    
+    totalError -= 3;
+    
+  }
+    if(sensorValues[2] < 40){
+    
+    totalError -= 2;
+    
+  }
+  
+      if(sensorValues[3] < 40){
+    
+    totalError -= 1;
+    
+  }
+  
+      if(sensorValues[4] < 40){
+    
+    totalError += 1;
+    
+  }
+  
+        if(sensorValues[5] < 40){
+    
+    totalError += 2;
+    
+  }
+        if(sensorValues[6] < 40){
+    
+    totalError += 3;
+    
+  }
+        if(sensorValues[7] < 40){
+    
+    totalError += 4;
+    
+  }
+  
+  
+  if(totalError < 0){
+    
+    rightSpeed = abs(totalError*baseSpeed);
+    leftSpeed = abs(totalError*baseSpeed/2);
+    
+      StepperFR.setSpeed(-rightSpeed);
+  StepperFL.setSpeed(leftSpeed);
+  StepperBR.setSpeed(-rightSpeed);
+  StepperBL.setSpeed(leftSpeed);  
+  }
+  
+  else if (totalError > 0){
+    
+    leftSpeed = abs(totalError*baseSpeed);
+    rightSpeed = abs(totalError*baseSpeed/2);
+    
+      StepperFR.setSpeed(-rightSpeed);
+  StepperFL.setSpeed(leftSpeed);
+  StepperBR.setSpeed(-rightSpeed);
+  StepperBL.setSpeed(leftSpeed);   
+  }
+  
+      StepperFL.runSpeed();
     StepperFR.runSpeed();
     StepperBL.runSpeed();
     StepperBR.runSpeed();
+  
+  
 }
+
+
